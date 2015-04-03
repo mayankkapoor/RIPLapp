@@ -5,5 +5,7 @@ from django.http import HttpResponse
 
 
 def home_page(request):
-	return HttpResponse('Bus Tracker Placeholder')
+	context = {}
+	return render(request, 'home.html', context)
+
 
