@@ -3,7 +3,8 @@ from django.core.urlresolvers import resolve
 from django.http import HttpRequest
 from django.template.loader import render_to_string
 
-from RIPLapp.views import home_page
+from RIPLapp.views import *
+from RIPLsite import settings
 
 # Create your tests here.
 
@@ -18,3 +19,9 @@ class HomePageTest(TestCase):
 		response = home_page(request)
 		expected_html = render_to_string('home.html')
 		self.assertEqual(response.content.decode(), expected_html)
+
+
+class Screen1LoginTest(TestCase):
+	def test_url_resolves_to_screen1_view(self):
+		found = resolve(settings.APP_URL +'/screen1/')
+		self.assertEqual(found.func, screen1_response)

@@ -9,3 +9,5 @@ def home_page(request):
 	return render(request, 'home.html', context)
 
 
+def screen1_response(request):
+	return
