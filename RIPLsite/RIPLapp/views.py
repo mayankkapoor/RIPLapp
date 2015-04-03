@@ -5,4 +5,5 @@ from django.http import HttpResponse
 
 
 def home_page(request):
-	return HttpResponse('Dashboard')
+	return HttpResponse('Bus Tracker Placeholder')
+
