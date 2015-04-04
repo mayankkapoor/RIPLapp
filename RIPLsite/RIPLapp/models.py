@@ -6,7 +6,7 @@ from django.core.validators import MinLengthValidator
 
 
 class Bus(models.Model):
-	bus_registration_no = models.CharField(max_length=20, null=False, blank=False)
+	bus_code_num = models.CharField(max_length=20, null=False, blank=False)
 	bus_safe_flag = models.BooleanField(default=False)
 	bus_safe_time = models.DateTimeField(null=True, blank=True)
 	bus_expected_number_of_children = models.IntegerField(null=True)
@@ -16,8 +16,14 @@ class Bus(models.Model):
 	bus_started_from_depot_flag = models.BooleanField(default=False)
 	bus_started_from_depot_time = models.DateTimeField(null=True, blank=True)
 
+	def __unicode__(self):              # __unicode__ on Python 2
+		return self.bus_code_no
+
 
 class Volunteer(models.Model):
-	volunteer_phone_number = models.BigIntegerField(null=False, validators=[MaxLengthValidator(10),MinLengthValidator(10)])
+	volunteer_phone_num = models.BigIntegerField(null=False, validators=[MaxLengthValidator(10), MinLengthValidator(10)])
 	volunteer_full_name = models.CharField(max_length=200, null=True, blank=True)
-	bus = models.ForeignKey(Bus)
+	volunteer_bus = models.ForeignKey(Bus)
+
+	def __unicode__(self):              # __unicode__ on Python 2
+		return self.volunteer_phone_number

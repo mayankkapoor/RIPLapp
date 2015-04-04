@@ -24,4 +24,4 @@ class HomePageTest(TestCase):
 class Screen1LoginTest(TestCase):
 	def test_url_resolves_to_screen1_view(self):
 		found = resolve(settings.APP_URL +'/screen1/')
-		self.assertEqual(found.func, screen1_response)
+		self.assertEqual(found.func, screen1login_response)
