@@ -36,7 +36,7 @@ class Bus(models.Model):
 	feedback_form_taken_from_ngo_time = models.DateTimeField(null=True, blank=True)
 
 	def __unicode__(self):              # __unicode__ on Python 2
-		return self.bus_code_no
+		return self.bus_code_num
 
 
 class Volunteer(models.Model):
@@ -45,4 +45,4 @@ class Volunteer(models.Model):
 	volunteer_bus = models.ForeignKey(Bus)
 
 	def __unicode__(self):              # __unicode__ on Python 2
-		return self.volunteer_phone_number
+		return self.volunteer_phone_num

@@ -1,3 +1,5 @@
 from django.contrib import admin
+from RIPLapp.models import Bus, Volunteer
 
-# Register your models here.
+admin.site.register(Bus)
+admin.site.register(Volunteer)
