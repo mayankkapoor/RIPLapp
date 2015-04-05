@@ -43,7 +43,7 @@ class Bus(models.Model):
 	bus_depot = models.ForeignKey(Depot, null=True)
 
 	def __unicode__(self):              # __unicode__ on Python 2
-		return self.bus_code_num
+		return u'%s' % self.bus_code_num
 
 
 class Volunteer(models.Model):
@@ -52,7 +52,7 @@ class Volunteer(models.Model):
 	volunteer_bus = models.ForeignKey(Bus, null=False)
 
 	def __unicode__(self):              # __unicode__ on Python 2
-		return self.volunteer_phone_num
+		return u'%s' % self.volunteer_phone_num
 
 
 class SOS(models.Model):
@@ -62,4 +62,4 @@ class SOS(models.Model):
 
 	def __unicode__(self):              # __unicode__ on Python 2
 		sos_string = self.sos_bus + "-" + self.sos_volunteer + "-" + self.sos_raise_time
-		return sos_string
+		return u'%s' % sos_string
