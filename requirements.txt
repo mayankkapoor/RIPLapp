@@ -1,5 +1,6 @@
-dj-database-url==0.3.0
 Django==1.8
+dj-database-url==0.3.0
+django-csvimport==2.4
 gunicorn==19.3.0
 psycopg2==2.6
 selenium==2.45.0
