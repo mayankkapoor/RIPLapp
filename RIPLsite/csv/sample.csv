@@ -1,0 +1,3 @@
+bus_code_num, bus_safe_flag, bus_expected_number_of_children, bus_expected_number_of_adults, bus_number_water_bottles_initial, bus_number_food_packets_initial, bus_started_from_depot_flag
+GHI678, false, 20, 2, 0, 0, false
+JKL901, false, 20, 2, 0, 0, false
