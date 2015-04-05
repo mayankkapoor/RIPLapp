@@ -16,10 +16,13 @@ def home_page(request):
 # function that returns JSON response for login screen
 @csrf_exempt
 def screen1login_response(request):
-	bus_code_num = request.POST["bus_code_num"]
-	volunteer_phone_num = request.POST["volunteer_phone_num"]
-	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
-	return HttpResponse(json.dumps(response_data), content_type="application/json")
+	bus_code_num = request.POST.get('bus_code_num', None)
+	volunteer_phone_num = request.POST.get('volunteer_phone_num', None)
+	if bus_code_num and volunteer_phone_num:
+		response_data = response_data_dict(bus_code_num, volunteer_phone_num)
+		return HttpResponse(json.dumps(response_data), content_type="application/json")
+	else:
+		return HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your POST request.")
 
 
 # function to return the full data set we have for a bus and volunteer as a dict
