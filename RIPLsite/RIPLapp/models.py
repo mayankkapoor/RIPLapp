@@ -5,6 +5,12 @@ from django.core.validators import MinLengthValidator
 # Create your models here.
 
 
+class Depot(models.Model):
+	depot_zone = models.IntegerField()
+	depot_code = models.CharField(max_length=32, blank=False, null=False)
+	depot_name = models.CharField(max_length=99, blank=False, null=False)
+
+
 class Bus(models.Model):
 	bus_code_num = models.CharField(max_length=20, null=False, blank=False)
 	bus_safe_flag = models.NullBooleanField(null=True)
@@ -34,6 +40,7 @@ class Bus(models.Model):
 	everyone_dropped_off_time = models.DateTimeField(null=True, blank=True)
 	feedback_form_taken_from_ngo_flag = models.NullBooleanField(null=True)
 	feedback_form_taken_from_ngo_time = models.DateTimeField(null=True, blank=True)
+	bus_depot = models.ForeignKey(Depot, null=True)
 
 	def __unicode__(self):              # __unicode__ on Python 2
 		return self.bus_code_num
@@ -42,7 +49,17 @@ class Bus(models.Model):
 class Volunteer(models.Model):
 	volunteer_phone_num = models.BigIntegerField(null=False, validators=[MaxLengthValidator(10), MinLengthValidator(10)])
 	volunteer_full_name = models.CharField(max_length=200, null=True, blank=True)
-	volunteer_bus = models.ForeignKey(Bus)
+	volunteer_bus = models.ForeignKey(Bus, null=False)
 
 	def __unicode__(self):              # __unicode__ on Python 2
 		return self.volunteer_phone_num
+
+
+class SOS(models.Model):
+	sos_bus = models.ForeignKey(Bus)
+	sos_volunteer = models.ForeignKey(Volunteer)
+	sos_raise_time = models.DateTimeField(null=False, blank=False)
+
+	def __unicode__(self):              # __unicode__ on Python 2
+		sos_string = self.sos_bus + "-" + self.sos_volunteer + "-" + self.sos_raise_time
+		return sos_string
