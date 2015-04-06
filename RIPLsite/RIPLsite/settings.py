@@ -120,6 +120,9 @@ STATIC_URL = '/static/'
 
 APP_URL = '/app'
 
-# Import local development server settings, settings_local not added to git
+# Import local development server settings, settings_local not added to git, ignore if not present on production
 
-from settings_local import *
+try:
+	from settings_local import *
+except ImportError as e:
+	pass
