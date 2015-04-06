@@ -1,5 +1,9 @@
 from django.shortcuts import render
-from RIPLapp.models import Bus
+from django_tables2   import RequestConfig
+from RIPLapp.models  import Bus, Volunteer
+from RIPLconsole.tables  import OperatorConsoleTable
 
 def index(request):
-    return render(request, "console.html", {"console": Bus.objects.all()})
+    table = OperatorConsoleTable(Volunteer.objects.all())
+    RequestConfig(request).configure(table)
+    return render(request, 'console.html', {'table': table})
