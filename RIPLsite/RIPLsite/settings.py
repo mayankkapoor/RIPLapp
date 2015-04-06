@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'RIPLsite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-if sys.platform == 'linux2':
+if sys.platform == 'linux2': # for Heroku
 	DATABASES['default'] = dj_database_url.config(default='postgres://mayankkapoor@localhost/mayankkapoor')
 else:
 	DATABASES = {
