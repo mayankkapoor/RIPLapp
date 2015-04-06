@@ -1,0 +1,27 @@
+1. Log into the admin console - http://127.0.0.1:8000/admin/ (Make sure you have trailing '/')
+2. Go into 'Csv imports' and 'Add csv import'
+3. Ensure your CSV files are in the exact same format as the CSV files:
+
+Depot: depot_zone,depot_code,depot_name
+Bus: bus_code_num,bus_expected_number_of_children,bus_expected_number_of_adults,depot_code
+Volunteer: volunteer_phone_num,volunteer_full_name,bus_code_num
+
+NOTE: no spaces before or after the commas as a precaution
+
+4. You have to import in the following fixed order: Depot, Bus, Volunteer
+5. Details when importing:
+
+Depot:
+- Model Name: RIPLapp.Depot
+- Field list: leave it empty
+- Upload file and save. If you see an error, it failed
+
+Bus:
+- Model Name: RIPLapp.Bus
+- Field list: column1=bus_code_num,column2=bus_expected_number_of_children,column3=bus_expected_number_of_adults,column4=bus_depot(Depot|depot_code)
+- Upload file and save. If you see an error, it failed
+
+Volunteer:
+- Model Name: RIPLapp.Volunteer
+- Field list: column1=volunteer_phone_num,column2=volunteer_full_name,column3=volunteer_bus(Bus|bus_code_num)
+- Upload file and save. If you see an error, it failed

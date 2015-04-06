@@ -7,12 +7,15 @@ from django.core.validators import MinLengthValidator
 
 class Depot(models.Model):
 	depot_zone = models.IntegerField()
-	depot_code = models.CharField(max_length=32, blank=False, null=False)
+	depot_code = models.CharField(max_length=32, primary_key=True)
 	depot_name = models.CharField(max_length=99, blank=False, null=False)
+
+	def __unicode__(self):              # __unicode__ on Python 2
+                return u'%s' % self.depot_code
 
 
 class Bus(models.Model):
-	bus_code_num = models.CharField(max_length=20, null=False, blank=False)
+	bus_code_num = models.CharField(max_length=20, primary_key=True)
 	bus_safe_flag = models.NullBooleanField(null=True)
 	bus_safe_time = models.DateTimeField(null=True, blank=True)
 	bus_expected_number_of_children = models.IntegerField(null=True)
@@ -47,7 +50,7 @@ class Bus(models.Model):
 
 
 class Volunteer(models.Model):
-	volunteer_phone_num = models.BigIntegerField(null=False, validators=[MaxLengthValidator(10), MinLengthValidator(10)])
+	volunteer_phone_num = models.BigIntegerField(primary_key=True, validators=[MaxLengthValidator(10), MinLengthValidator(10)])
 	volunteer_full_name = models.CharField(max_length=200, null=True, blank=True)
 	volunteer_bus = models.ForeignKey(Bus, null=False)
 
