@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'RIPLapp.views.home_page', name='home_page'),
     url(r'^app/', include('RIPLapp.urls')),
+    url(r'^console/', include('RIPLconsole.urls')),
 ]

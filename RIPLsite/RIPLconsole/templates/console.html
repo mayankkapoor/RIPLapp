@@ -1,0 +1,17 @@
+{# Console.html. Central page for operators  #}
+{% load render_table from django_tables2 %}
+<!doctype html>
+<html>
+    <title>
+	Operator Console
+    </title>
+    <head>
+	<link rel="stylesheet" href="/static/django_tables2/themes/paleblue/css/screen.css" />
+    </head>
+    <body>
+	<h2>SOS</h2>
+	{% render_table sos %}
+	<h2>Tracking</h2>
+        {% render_table tracking %}
+    </body>
+</html
