@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os, sys
+import os
+import sys
 import dj_database_url  # Heroku configuration
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -79,17 +80,22 @@ WSGI_APPLICATION = 'RIPLsite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-if sys.platform != 'linux2':  # for Heroku
+DATABASES = {
+	'default': dj_database_url.config(default='postgres://mayankkapoor@localhost/mayankkapoor')
+}
+# Travis CI
+if 'TRAVIS' in os.environ:
 	DATABASES = {
 		'default': {
-			'ENGINE': 'django.db.backends.sqlite3',
-			'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+			'ENGINE': 'django.db.backends.postgresql_psycopg2',
+			'NAME': 'travisci',
+			'USER': 'postgres',
+			'PASSWORD': '',
+			'HOST': 'localhost',
+			'PORT': '',
 		}
 	}
-else:
-	DATABASES = {
-		'default': dj_database_url.config(default='postgres://mayankkapoor@localhost/mayankkapoor')
-	}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -113,3 +119,7 @@ STATIC_URL = '/static/'
 # RIPL constants
 
 APP_URL = '/app'
+
+# Import local development server settings, settings_local not added to git
+
+from settings_local import *
