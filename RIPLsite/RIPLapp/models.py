@@ -42,16 +42,29 @@ class Bus(models.Model):
 	feedback_form_taken_from_ngo_time = models.DateTimeField(null=True, blank=True)
 	bus_depot = models.ForeignKey(Depot, null=True)
 
-	def __unicode__(self):              # __unicode__ on Python 2
+	def __unicode__(self):  # __unicode__ on Python 2
 		return u'%s' % self.bus_code_num
 
 
 class Volunteer(models.Model):
-	volunteer_phone_num = models.BigIntegerField(null=False, validators=[MaxLengthValidator(10), MinLengthValidator(10)])
+	volunteer_phone_num = models.BigIntegerField(null=False,
+	                                             validators=[MaxLengthValidator(10), MinLengthValidator(10)])
 	volunteer_full_name = models.CharField(max_length=200, null=True, blank=True)
 	volunteer_bus = models.ForeignKey(Bus, null=False)
 
-	def __unicode__(self):              # __unicode__ on Python 2
+	def save(self, *args, **kwargs):
+		"""
+
+		:type kwargs: object
+		"""
+		query_buses = Bus.objects.filter(bus_code_num=self.volunteer_bus.bus_code_num,
+		                                 volunteer__volunteer_phone_num=self.volunteer_phone_num)
+		if query_buses.count() != 0:
+			print "Volunteer-bus_code_num combination already exists in database. Not saving again."
+		else:
+			super(Volunteer, self).save(*args, **kwargs)
+
+	def __unicode__(self):  # __unicode__ on Python 2
 		return u'%s' % self.volunteer_phone_num
 
 
@@ -60,6 +73,6 @@ class SOS(models.Model):
 	sos_volunteer = models.ForeignKey(Volunteer)
 	sos_raise_time = models.DateTimeField(null=False, blank=False)
 
-	def __unicode__(self):              # __unicode__ on Python 2
+	def __unicode__(self):  # __unicode__ on Python 2
 		sos_string = self.sos_bus + "-" + self.sos_volunteer + "-" + self.sos_raise_time
 		return u'%s' % sos_string

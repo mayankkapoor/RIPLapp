@@ -16,8 +16,12 @@ def home_page(request):
 # function that returns JSON response for login screen
 @csrf_exempt
 def screen1login_response(request):
-	bus_code_num = request.POST.get('bus_code_num', None)
-	volunteer_phone_num = request.POST.get('volunteer_phone_num', None)
+	if request.method == 'POST':
+		bus_code_num = request.POST.get('bus_code_num', None)
+		volunteer_phone_num = request.POST.get('volunteer_phone_num', None)
+	else:
+		bus_code_num = request.GET.get('bus_code_num', None)
+		volunteer_phone_num = request.GET.get('volunteer_phone_num', None)
 	if bus_code_num and volunteer_phone_num:
 		response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -38,8 +42,8 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 			new_volunteer.save()
 		elif query_buses.count() == 1:
 			bus = query_buses[0]
-			bus_data_dict = turn_bus_data_into_dict(bus)
-			# print bus_data_dict
+			bus_data_dict = turn_bus_data_into_dict(bus, volunteer_phone_num)
+		# print bus_data_dict
 		else:
 			print "Error! More than 1 buses returned for given bus code and volunteer phone number. Should not be " \
 			      "possible. Buses: ", query_buses
@@ -49,13 +53,33 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 
 
 # Encapsulating mainly for DRY later.
-def turn_bus_data_into_dict(bus):
-	bus_data_dict = {'bus_safe_flag': bus.bus_safe_flag, 'bus_safe_time': bus.bus_safe_time,
+def turn_bus_data_into_dict(bus, volunteer_phone_num):
+	bus_data_dict = {'bus_code_num': bus.bus_code_num, 'volunteer_phone_num': volunteer_phone_num,
+	                 'bus_safe_flag': bus.bus_safe_flag, 'bus_safe_time': bus.bus_safe_time,
 	                 'bus_expected_number_of_children': bus.bus_expected_number_of_children,
 	                 'bus_expected_number_of_adults': bus.bus_expected_number_of_adults,
 	                 'bus_number_food_packets_initial': bus.bus_number_food_packets_initial,
 	                 'bus_number_water_bottles_initial': bus.bus_number_water_bottles_initial,
 	                 'bus_started_from_depot_flag': bus.bus_started_from_depot_flag,
-	                 'bus_started_from_depot_time': bus.bus_started_from_depot_time
+	                 'bus_started_from_depot_time': bus.bus_started_from_depot_time,
+	                 'bus_first_aid_kit_available_flag': bus.bus_first_aid_kit_available_flag,
+	                 'bus_num_children_male_pickedup': bus.bus_num_children_male_pickedup,
+	                 'bus_num_children_female_pickedup': bus.bus_num_children_female_pickedup,
+	                 'bus_num_adults_male_pickedup': bus.bus_num_adults_male_pickedup,
+	                 'bus_num_adults_female_pickedup': bus.bus_num_adults_female_pickedup,
+	                 'all_deboarded_at_stadium_flag': bus.all_deboarded_at_stadium_flag,
+	                 'all_deboarded_at_stadium_time': bus.all_deboarded_at_stadium_time,
+	                 'num_children_male_seated': bus.num_children_male_seated,
+	                 'num_children_female_seated': bus.num_children_female_seated,
+	                 'num_adults_male_seated': bus.num_adults_male_seated,
+	                 'num_adults_female_seated': bus.num_adults_female_seated,
+	                 'bus_num_children_male_return_journey': bus.bus_num_children_male_return_journey,
+	                 'bus_num_children_female_return_journey': bus.bus_num_children_female_return_journey,
+	                 'bus_num_adults_male_return_journey': bus.bus_num_adults_male_return_journey,
+	                 'bus_num_adults_female_return_journey': bus.bus_num_adults_female_return_journey,
+	                 'everyone_dropped_off_flag': bus.everyone_dropped_off_flag,
+	                 'everyone_dropped_off_time': bus.everyone_dropped_off_time,
+	                 'feedback_form_taken_from_ngo_flag': bus.feedback_form_taken_from_ngo_flag,
+	                 'feedback_form_taken_from_ngo_time': bus.feedback_form_taken_from_ngo_time
 	                 }
 	return bus_data_dict
