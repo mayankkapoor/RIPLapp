@@ -1,10 +1,19 @@
 import django_tables2 as tables
-from RIPLapp.models import Depot, Bus, Volunteer
+from RIPLapp.models import Depot, Bus, Volunteer, SOS
 from django.utils.safestring import mark_safe
 
-class DepotTable(tables.Table):
+class SOSTable(tables.Table):
+    def render_sos_bus(self,value):
+        return mark_safe('<span style="background-color: red">%s</span>' % value);
+
+    def render_sos_volunteer(self,value):
+        return mark_safe('<span style="background-color: red">%s</span>' % value);
+
+    def render_sos_raise_time(self,value):
+        return mark_safe('<span style="background-color: red">%s</span>' % value);
+
     class Meta:
-        model = Depot
+        model = SOS
         # add class="paleblue" to <table> tag
         attrs = {"class": "paleblue"}
 

@@ -64,5 +64,5 @@ class SOS(models.Model):
 	sos_raise_time = models.DateTimeField(null=False, blank=False)
 
 	def __unicode__(self):              # __unicode__ on Python 2
-		sos_string = self.sos_bus + "-" + self.sos_volunteer + "-" + self.sos_raise_time
+		sos_string = str(self.sos_bus) + "-" + str(self.sos_volunteer) + "-" + str(self.sos_raise_time)
 		return u'%s' % sos_string
