@@ -15,20 +15,46 @@ def home_page(request):
 
 # function that returns JSON response for login screen
 @csrf_exempt
-def screen1login_response(request):
-	if request.method == 'POST':
-		bus_code_num = request.POST.get('bus_code_num', None)
-		volunteer_phone_num = request.POST.get('volunteer_phone_num', None)
+def request_obtain(request,param):
+	if request.method == 'POST':	
+		param_data=request.POST.get(param,None)
 	else:
-		bus_code_num = request.GET.get('bus_code_num', None)
-		volunteer_phone_num = request.GET.get('volunteer_phone_num', None)
+		param_data = request.GET.get(param,None)	
+	return param_data
+
+def get_bus_phone(request):
+	bus_code_num = request_obtain(request,'bus_code_num')
+	volunteer_phone_num =request_obtain(request,'volunteer_phone_num')
 	if bus_code_num and volunteer_phone_num:
+		#The success will be handled by respective API handlers		
+		return bus_code_num,volunteer_phone_num
+	else:
+		raise Exception(HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your "+request.method+" request."))
+			
+		
+def screen1login_response(request):
+	bus_code_num,volunteer_phone_num = get_bus_phone(request)
+	#With the above function, the below if check is redundant, still keeping it as it is
+	#TODO clean up the if check after verifying its not required
+	if bus_code_num and volunteer_phone_num:
+		#This allows association of a single phone w/ multiple buses, is it correct?
 		response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
 		return HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your POST request.")
 
 
+def screen2bus_safe_response(request):
+	bus_code_num,volunteer_phone_num = get_bus_phone(request)
+	bus_safe_flag = request_obtain(request,'bus_safe_flag') 
+	#TODO add function to save any param to the dict @@def save_bus_param
+	#The below is temporary return till this function is ready
+	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
+	return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+#TODO
+#def save_bus_param(bus_code_num,param)
+		
 # function to return the full data set we have for a bus and volunteer as a dict
 def response_data_dict(bus_code_num, volunteer_phone_num):
 	try:
