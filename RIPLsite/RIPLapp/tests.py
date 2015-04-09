@@ -208,7 +208,7 @@ class Screen6EveryoneDeboardedTest(TestCase):
 						}
 		for key in screen6_vars:
 			if 'flag' in key:
-				correct_bus_dict.update({key:random.randint(0,1)})
+				correct_bus_dict.update({key: random.randint(0, 1)})
 		response = self.client.post(settings.APP_URL + '/screen6/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})

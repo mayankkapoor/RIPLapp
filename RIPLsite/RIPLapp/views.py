@@ -186,7 +186,7 @@ def screen5_total_people_picked(request):
 @csrf_exempt
 def screen6_everyone_deboarded(request):
 	time_now = timezone.now()
-	screen6_vars = {'all_deboarded_at_stadium_flag': 1,
+	screen6_vars = {'all_deboarded_at_stadium_flag': 0,
 	                'all_deboarded_at_stadium_time': time_now,
 	                'bus_furthest_screen': 6
 	                }
