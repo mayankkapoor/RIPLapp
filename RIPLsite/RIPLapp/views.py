@@ -55,7 +55,9 @@ def screen1login_response(request):
 		response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
-		return HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your POST request.")
+		response = HttpResponse()
+		response.status_code = 500
+		return response("Either bus_code_num or volunteer_phone_num doesn't exist in your POST request.")
 
 
 @csrf_exempt
@@ -86,7 +88,7 @@ def screen3bus_supply_count(request):
 @csrf_exempt
 def screen4bus_started_depot(request):
 	time_now = timezone.now()
-	screen4_vars = {'bus_started_from_depot_flag': 0,
+	screen4_vars = {'bus_started_from_depot_flag': 0, # Default is 0 or False
 	                'bus_started_from_depot_time': time_now,
 	                'bus_furthest_screen': 4
 	                }
@@ -109,7 +111,9 @@ def screen_data_processing(request, screen_vars, auto_vars=[]):
 	if bus_screen_status == 0:
 		return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
 	else:
-		return HttpResponse("INTERNAL_SERVER_ERROR")
+		response = HttpResponse()
+		response.status_code = 500
+		return response
 
 
 def save_bus_param(bus_code_num, volunteer_phone_num, param, param_value):
@@ -190,5 +194,5 @@ def screen6_everyone_deboarded(request):
 	                'all_deboarded_at_stadium_time': time_now,
 	                'bus_furthest_screen': 6
 	                }
-	auto_vars = ['all_deboarded_at_stadium_time', 'all_deboarded_at_stadium_flag']
+	auto_vars = ['all_deboarded_at_stadium_time']
 	return screen_data_processing(request, screen6_vars, auto_vars)
