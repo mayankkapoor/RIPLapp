@@ -54,7 +54,7 @@ def screen2bus_safe_response(request):
 				'bus_furthest_screen':2
 				}
 	auto_vars = ['bus_safe_time']
-	return screen_data_processing(request, screen2_vars,auto_vars)
+	return screen_data_processing(request, screen2_vars, auto_vars)
 
 @csrf_exempt
 def screen3bus_supply_count(request):
@@ -78,7 +78,7 @@ def screen4bus_started_depot(request):
 					'bus_furthest_screen':4
 					}
 	auto_vars = ['bus_started_from_depot_time']
-	return screen_data_processing(request,screen4_vars,auto_vars)
+	return screen_data_processing(request, screen4_vars, auto_vars)
 
 def screen_data_processing(request,screen_vars,auto_vars=[]):
 	bus_screen_status = 0
