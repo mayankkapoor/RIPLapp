@@ -31,7 +31,7 @@ class Bus(models.Model):
 	bus_num_children_female_pickedup = models.IntegerField(null=True)
 	bus_num_adults_male_pickedup = models.IntegerField(null=True)
 	bus_num_adults_female_pickedup = models.IntegerField(null=True)
-	# all_deboarded_at_stadium_flag = models.IntegerField(null=True)
+	all_deboarded_at_stadium_flag = models.IntegerField(null=True)
 	all_deboarded_at_stadium_time = models.DateTimeField(null=True, blank=True)
 	num_children_male_seated = models.IntegerField(null=True)
 	num_children_female_seated = models.IntegerField(null=True)
