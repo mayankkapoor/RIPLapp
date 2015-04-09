@@ -53,8 +53,6 @@ def screen2bus_safe_response(request):
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_flag', True)
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_time', timezone.now())  # UTC time
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 2)
-	# Hack as workaround
-
 	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
 
 
@@ -108,20 +106,20 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 # Encapsulating mainly for DRY later.
 def turn_bus_data_into_dict(bus, volunteer_phone_num):
 	bus_data_dict = {'bus_code_num': bus.bus_code_num, 'volunteer_phone_num': volunteer_phone_num,
-	                 'bus_safe_flag': bus.bus_safe_flag, 'bus_safe_time': bus.bus_safe_time,
+	                 'bus_safe_flag': bus.bus_safe_flag, 'bus_safe_time': str(bus.bus_safe_time),
 	                 'bus_expected_number_of_children': bus.bus_expected_number_of_children,
 	                 'bus_expected_number_of_adults': bus.bus_expected_number_of_adults,
 	                 'bus_number_food_packets_initial': bus.bus_number_food_packets_initial,
 	                 'bus_number_water_bottles_initial': bus.bus_number_water_bottles_initial,
 	                 'bus_started_from_depot_flag': bus.bus_started_from_depot_flag,
-	                 'bus_started_from_depot_time': bus.bus_started_from_depot_time,
+	                 'bus_started_from_depot_time': str(bus.bus_started_from_depot_time),
 	                 'bus_first_aid_kit_available_flag': bus.bus_first_aid_kit_available_flag,
 	                 'bus_num_children_male_pickedup': bus.bus_num_children_male_pickedup,
 	                 'bus_num_children_female_pickedup': bus.bus_num_children_female_pickedup,
 	                 'bus_num_adults_male_pickedup': bus.bus_num_adults_male_pickedup,
 	                 'bus_num_adults_female_pickedup': bus.bus_num_adults_female_pickedup,
 	                 'all_deboarded_at_stadium_flag': bus.all_deboarded_at_stadium_flag,
-	                 'all_deboarded_at_stadium_time': bus.all_deboarded_at_stadium_time,
+	                 'all_deboarded_at_stadium_time': str(bus.all_deboarded_at_stadium_time),
 	                 'num_children_male_seated': bus.num_children_male_seated,
 	                 'num_children_female_seated': bus.num_children_female_seated,
 	                 'num_adults_male_seated': bus.num_adults_male_seated,
@@ -131,9 +129,25 @@ def turn_bus_data_into_dict(bus, volunteer_phone_num):
 	                 'bus_num_adults_male_return_journey': bus.bus_num_adults_male_return_journey,
 	                 'bus_num_adults_female_return_journey': bus.bus_num_adults_female_return_journey,
 	                 'everyone_dropped_off_flag': bus.everyone_dropped_off_flag,
-	                 'everyone_dropped_off_time': bus.everyone_dropped_off_time,
+	                 'everyone_dropped_off_time': str(bus.everyone_dropped_off_time),
 	                 'feedback_form_taken_from_ngo_flag': bus.feedback_form_taken_from_ngo_flag,
-	                 'feedback_form_taken_from_ngo_time': bus.feedback_form_taken_from_ngo_time,
+	                 'feedback_form_taken_from_ngo_time': str(bus.feedback_form_taken_from_ngo_time),
 	                 'bus_furthest_screen': bus.bus_furthest_screen
 	                 }
 	return bus_data_dict
+
+
+# Screen 5 total people picked after last checkpoint
+@csrf_exempt
+def screen5_total_people_picked(request):
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	bus_num_children_male_pickedup = request_obtain(request, 'bus_num_children_male_pickedup')
+	bus_num_children_female_pickedup = request_obtain(request, 'bus_num_children_female_pickedup')
+	bus_num_adults_male_pickedup = request_obtain(request, 'bus_num_adults_male_pickedup')
+	bus_num_adults_female_pickedup = request_obtain(request, 'bus_num_adults_female_pickedup')
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_children_male_pickedup', bus_num_children_male_pickedup)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_children_female_pickedup', bus_num_children_female_pickedup)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_adults_male_pickedup', bus_num_adults_male_pickedup)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_adults_female_pickedup', bus_num_adults_female_pickedup)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 5)
+	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
