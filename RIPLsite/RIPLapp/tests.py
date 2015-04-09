@@ -34,8 +34,28 @@ class Screen1LoginTest(TestCase):
 		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
 
 		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		# print response
 
 		self.assertContains(response, 'correct_bus')
 		self.assertNotContains(response, 'other_bus')
 		self.assertContains(response, '1111111111')
 		self.assertNotContains(response, '2222222222')
+
+
+class Screen2BusSafeTest(TestCase):
+	def test_url_resolves_to_screen2_view(self):
+		found = resolve(settings.APP_URL + '/screen2/')
+		self.assertEqual(found.func, screen2bus_safe_response)
+
+	def test_screen2_saves_to_correct_bus(self):
+		new_bus = Bus.objects.create(bus_code_num='correct_bus', bus_expected_number_of_children=1)
+		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+
+		self.client.post(settings.APP_URL + '/screen2/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+
+		self.assertEqual(new_bus.bus_safe_flag, True)
+		self.assertEqual(new_bus.bus_furthest_screen, 2)
+		self.assertNotEqual(other_bus.bus_safe_flag, True)
+		self.assertNotEqual(other_bus.bus_furthest_screen, 2)

@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import sys, json
+import sys
+import json
+import datetime
 
 from RIPLapp.models import Volunteer, Bus
 
@@ -14,46 +16,71 @@ def home_page(request):
 
 
 # function that returns JSON response for login screen
-@csrf_exempt
-def request_obtain(request,param):
+def request_obtain(request, param):
 	if request.method == 'POST':	
-		param_data=request.POST.get(param,None)
+		param_data=request.POST.get(param, None)
 	else:
-		param_data = request.GET.get(param,None)	
+		param_data = request.GET.get(param, None)
 	return param_data
 
+
 def get_bus_phone(request):
-	bus_code_num = request_obtain(request,'bus_code_num')
-	volunteer_phone_num =request_obtain(request,'volunteer_phone_num')
+	bus_code_num = request_obtain(request, 'bus_code_num')
+	volunteer_phone_num = request_obtain(request, 'volunteer_phone_num')
 	if bus_code_num and volunteer_phone_num:
-		#The success will be handled by respective API handlers		
-		return bus_code_num,volunteer_phone_num
+		# The success will be handled by respective API handlers
+		return bus_code_num, volunteer_phone_num
 	else:
 		raise Exception(HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your "+request.method+" request."))
-			
-		
+
+@csrf_exempt
 def screen1login_response(request):
 	bus_code_num,volunteer_phone_num = get_bus_phone(request)
 	#With the above function, the below if check is redundant, still keeping it as it is
-	#TODO clean up the if check after verifying its not required
+	#TODO clean up the if check after verifying it's not required
 	if bus_code_num and volunteer_phone_num:
-		#This allows association of a single phone w/ multiple buses, is it correct?
+		# TODO: This allows association of a single phone w/ multiple buses, is it correct?
+		# MK: No. multiple phones for 1 bus is possible. Multiple buses per phone should not be possible.
 		response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
 		return HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your POST request.")
 
-
+@csrf_exempt
 def screen2bus_safe_response(request):
-	bus_code_num,volunteer_phone_num = get_bus_phone(request)
-	bus_safe_flag = request_obtain(request,'bus_safe_flag') 
-	#TODO add function to save any param to the dict @@def save_bus_param
-	#The below is temporary return till this function is ready
-	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
-	return HttpResponse(json.dumps(response_data), content_type="application/json")
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	# TODO: Fix save_bus_param function
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_flag', True)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_time', datetime.datetime.now())  # UTC time
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 2)
+	# Hack as workaround
 
-#TODO
-#def save_bus_param(bus_code_num,param)
+	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
+
+
+def save_bus_param(bus_code_num, volunteer_phone_num, param, param_value):
+	query_buses = Bus.objects.filter(bus_code_num=bus_code_num, volunteer__volunteer_phone_num=volunteer_phone_num)
+	# print query_buses.count()
+	if query_buses.count() == 0:
+		new_volunteer = Volunteer(volunteer_phone_num=volunteer_phone_num)
+		new_bus = Bus(bus_code_num=bus_code_num)
+		new_bus.save()
+		new_volunteer.volunteer_bus = new_bus
+		new_volunteer.save()
+		setattr(new_bus, param, param_value)
+		new_bus.save()
+		print getattr(new_bus, param)
+	elif query_buses.count() == 1:
+		bus = query_buses[0]
+		# print bus
+		setattr(bus, param, param_value)
+		bus.save()
+		# print bus
+		print getattr(bus, param) #TODO: Doesn't seem to work
+	else:
+		print "Error! More than 1 buses returned for given bus code and volunteer phone number. Should not be " \
+		      "possible. Buses: ", query_buses
+
 		
 # function to return the full data set we have for a bus and volunteer as a dict
 def response_data_dict(bus_code_num, volunteer_phone_num):
@@ -69,7 +96,7 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 		elif query_buses.count() == 1:
 			bus = query_buses[0]
 			bus_data_dict = turn_bus_data_into_dict(bus, volunteer_phone_num)
-		# print bus_data_dict
+			# print bus_data_dict
 		else:
 			print "Error! More than 1 buses returned for given bus code and volunteer phone number. Should not be " \
 			      "possible. Buses: ", query_buses
@@ -106,6 +133,7 @@ def turn_bus_data_into_dict(bus, volunteer_phone_num):
 	                 'everyone_dropped_off_flag': bus.everyone_dropped_off_flag,
 	                 'everyone_dropped_off_time': bus.everyone_dropped_off_time,
 	                 'feedback_form_taken_from_ngo_flag': bus.feedback_form_taken_from_ngo_flag,
-	                 'feedback_form_taken_from_ngo_time': bus.feedback_form_taken_from_ngo_time
+	                 'feedback_form_taken_from_ngo_time': bus.feedback_form_taken_from_ngo_time,
+	                 'bus_furthest_screen': bus.bus_furthest_screen
 	                 }
 	return bus_data_dict
