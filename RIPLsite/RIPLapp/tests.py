@@ -67,3 +67,11 @@ class Screen5TotalPeoplePickedTest(TestCase):
 		self.assertEqual(found.func, screen5_total_people_picked)
 
 	#TODO: Screen 5 unit test
+
+
+class Screen6EveryoneDeboardedTest(TestCase):
+	def test_url_resolves_to_screen1_view(self):
+		found = resolve(settings.APP_URL + '/screen6/')
+		self.assertEqual(found.func, screen6_everyone_deboarded)
+
+	#TODO: Screen 6 unit test

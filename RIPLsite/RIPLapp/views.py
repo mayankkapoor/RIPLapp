@@ -49,7 +49,6 @@ def screen1login_response(request):
 @csrf_exempt
 def screen2bus_safe_response(request):
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
-	# TODO: Fix save_bus_param function
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_flag', True)
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_time', timezone.now())  # UTC time
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 2)
@@ -151,3 +150,14 @@ def screen5_total_people_picked(request):
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_adults_female_pickedup', bus_num_adults_female_pickedup)
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 5)
 	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
+
+
+# Screen 6 total people picked after last checkpoint
+@csrf_exempt
+def screen6_everyone_deboarded(request):
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'all_deboarded_at_stadium_flag', True)
+	save_bus_param(bus_code_num, volunteer_phone_num, 'all_deboarded_at_stadium_time', timezone.now())  # UTC time
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 6)
+	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
+
