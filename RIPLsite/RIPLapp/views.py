@@ -146,7 +146,7 @@ def turn_bus_data_into_dict(bus, volunteer_phone_num):
 	for attr,value in bus.__dict__.iteritems():
 		if type(value) is not int:
 			value = str(value)
-		bus_data_dict[attr] = str(value)
+		bus_data_dict[attr] = value
 	bus_data_dict['volunteer_phone_num'] = volunteer_phone_num
 	return bus_data_dict
 
