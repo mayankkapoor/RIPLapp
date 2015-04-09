@@ -6,7 +6,9 @@ from django.template.loader import render_to_string
 from RIPLapp.views import *
 from RIPLapp.models import Bus, Volunteer
 from RIPLsite import settings
-
+import random
+import yaml
+from django.utils import timezone
 # Create your tests here.
 
 
@@ -47,19 +49,100 @@ class Screen2BusSafeTest(TestCase):
 		found = resolve(settings.APP_URL + '/screen2/')
 		self.assertEqual(found.func, screen2bus_safe_response)
 
-	#TODO: screen2 test isn't passing, likely due to test database not saving into test database from app url.
-	# def test_screen2_saves_to_correct_bus(self):
-	# 	new_bus = Bus.objects.create(bus_code_num='correct_bus')
-	# 	new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
-	# 	other_bus = Bus.objects.create(bus_code_num='other_bus')
-	# 	other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
-	#
-	# 	self.client.post(settings.APP_URL + '/screen2/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
-	#
-	# 	self.assertTrue(new_bus.bus_safe_flag)
-	# 	self.assertEqual(new_bus.bus_furthest_screen, 2)
-	# 	self.assertNotEqual(other_bus.bus_furthest_screen, 2)
+	def test_screen2_saves_to_correct_bus(self):
+		new_bus = Bus.objects.create(bus_code_num='correct_bus')
+		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+		#It first needs to go to screen1 for creating the bus
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response, 'correct_bus')
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		self.assertContains(response, 'other_bus')
+		response = self.client.post(settings.APP_URL + '/screen2/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response, 'OK')
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response,'"bus_safe_flag": "True"')
+		self.assertContains(response,'"bus_code_num": "correct_bus"')
+		self.assertContains(response,'"bus_furthest_screen": 2')
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		self.assertContains(response,'"bus_furthest_screen": "None"')
 
+class Screen3BusSupplyCountTest(TestCase):
+	def test_url_resolves_to_screen3_view(self):
+		found = resolve(settings.APP_URL + '/screen3/')
+		self.assertEqual(found.func, screen3bus_supply_count)
+
+	def test_screen3_saves_to_correct_bus(self):
+		new_bus = Bus.objects.create(bus_code_num='correct_bus')
+		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+		#It first needs to go to screen1 for creating the bus
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response, 'correct_bus')
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		self.assertContains(response, 'other_bus')
+		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
+		screen3_vars = {'bus_number_water_bottles_initial':0,
+				'bus_number_food_packets_initial':0,
+				'bus_number_tickets_initial':0,
+				'bus_first_aid_kit_available_flag':0,
+				'everyone_dropped_off_flag':0,
+				'bus_furthest_screen':3
+				}
+		for key in screen3_vars:
+			if 'number' in key:
+				correct_bus_dict.update({key:random.randint(1,100)})
+			if 'flag' in key:
+				correct_bus_dict.update({key:random.randint(0,1)})
+		response = self.client.post(settings.APP_URL + '/screen3/', correct_bus_dict)
+		self.assertContains(response, 'OK')
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		response_yaml = yaml.load(response.content)
+		for key in correct_bus_dict:
+			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+	
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		response_yaml = yaml.load(response.content)
+		for key in screen3_vars:
+			self.assertEqual(str(response_yaml[key]), str(None))
+
+class Screen4BusdepotstartedTest(TestCase):
+	def test_url_resolves_to_screen3_view(self):
+		found = resolve(settings.APP_URL + '/screen4/')
+		self.assertEqual(found.func, screen4bus_started_depot)
+
+	def test_screen4_saves_to_correct_bus(self):
+		new_bus = Bus.objects.create(bus_code_num='correct_bus')
+		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+		#It first needs to go to screen1 for creating the bus
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response, 'correct_bus')
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		self.assertContains(response, 'other_bus')
+		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
+		time_now = timezone.now()
+		screen4_vars = {'bus_started_from_depot_flag':0,
+						'bus_started_from_depot_time':time_now,
+						'bus_furthest_screen':4
+						}
+		for key in screen4_vars:
+			if 'flag' in key:
+				correct_bus_dict.update({key:random.randint(0,1)})
+		response = self.client.post(settings.APP_URL + '/screen4/', correct_bus_dict)
+		self.assertContains(response, 'OK')
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		response_yaml = yaml.load(response.content)
+		for key in correct_bus_dict:
+			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+	
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		response_yaml = yaml.load(response.content)
+		for key in screen4_vars:
+			self.assertEqual(str(response_yaml[key]), str(None))
 
 class Screen5TotalPeoplePickedTest(TestCase):
 	def test_url_resolves_to_screen1_view(self):
