@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import sys
 import json
-import datetime
+from django.utils import timezone
 
 from RIPLapp.models import Volunteer, Bus
 
@@ -51,7 +51,7 @@ def screen2bus_safe_response(request):
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	# TODO: Fix save_bus_param function
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_flag', True)
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_time', datetime.datetime.now())  # UTC time
+	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_time', timezone.now())  # UTC time
 	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 2)
 	# Hack as workaround
 
@@ -69,7 +69,7 @@ def save_bus_param(bus_code_num, volunteer_phone_num, param, param_value):
 		new_volunteer.save()
 		setattr(new_bus, param, param_value)
 		new_bus.save()
-		print getattr(new_bus, param)
+		# print getattr(new_bus, param)
 	elif query_buses.count() == 1:
 		bus = query_buses[0]
 		# print bus
