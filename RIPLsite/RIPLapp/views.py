@@ -48,36 +48,73 @@ def screen1login_response(request):
 
 @csrf_exempt
 def screen2bus_safe_response(request):
-	bus_code_num, volunteer_phone_num = get_bus_phone(request)
-	# TODO: Fix save_bus_param function
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_flag', True)
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_safe_time', timezone.now())  # UTC time
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 2)
-	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
+	time_now = timezone.now()
+	screen2_vars = {'bus_safe_flag':1,
+				'bus_safe_time':time_now,
+				'bus_furthest_screen':2
+				}
+	auto_vars = ['bus_safe_time']
+	return screen_data_processing(request, screen2_vars, auto_vars)
 
+@csrf_exempt
+def screen3bus_supply_count(request):
+	screen3_vars = {'bus_number_water_bottles_initial':0,
+					'bus_number_food_packets_initial':0,
+					'bus_number_tickets_initial':0,
+					#There is some problem in toggling it back to false from True for the flags
+					#Changed boolean to int to hack around toggle problem
+					# 0 = False, Non-zero=True
+					'bus_first_aid_kit_available_flag':0,
+					'everyone_dropped_off_flag':0,
+					'bus_furthest_screen':3
+					}
+	return screen_data_processing(request, screen3_vars)
+
+@csrf_exempt
+def screen4bus_started_depot(request):
+	time_now = timezone.now()
+	screen4_vars = {'bus_started_from_depot_flag':0,
+					'bus_started_from_depot_time':time_now,
+					'bus_furthest_screen':4
+					}
+	auto_vars = ['bus_started_from_depot_time']
+	return screen_data_processing(request, screen4_vars, auto_vars)
+
+def screen_data_processing(request,screen_vars,auto_vars=[]):
+	bus_screen_status = 0
+	auto_vars.append('bus_furthest_screen')
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	
+	for key in screen_vars: 
+		if key not in auto_vars:
+			screen_vars[key] = request_obtain(request, key)
+	
+	for key in screen_vars:
+		bus_screen_status += save_bus_param(bus_code_num, volunteer_phone_num, key, screen_vars[key])
+	
+	if bus_screen_status == 0:
+		return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
+	else:
+		return HttpResponse("INTERNAL_SERVER_ERROR")
 
 def save_bus_param(bus_code_num, volunteer_phone_num, param, param_value):
 	query_buses = Bus.objects.filter(bus_code_num=bus_code_num, volunteer__volunteer_phone_num=volunteer_phone_num)
-	# print query_buses.count()
 	if query_buses.count() == 0:
-		new_volunteer = Volunteer(volunteer_phone_num=volunteer_phone_num)
-		new_bus = Bus(bus_code_num=bus_code_num)
-		new_bus.save()
-		new_volunteer.volunteer_bus = new_bus
-		new_volunteer.save()
-		setattr(new_bus, param, param_value)
-		new_bus.save()
-		# print getattr(new_bus, param)
+		#This call should always be on a pre existing bus
+		#If a bus does not exist its an error
+		return 1
 	elif query_buses.count() == 1:
 		bus = query_buses[0]
-		# print bus
 		setattr(bus, param, param_value)
 		bus.save()
-		# print bus
-		print getattr(bus, param) #TODO: Doesn't seem to work
+		if (getattr(bus, param) == param_value):
+			return 0
+		else:
+			return 1 
 	else:
 		print "Error! More than 1 buses returned for given bus code and volunteer phone number. Should not be " \
 		      "possible. Buses: ", query_buses
+		return 1
 
 		
 # function to return the full data set we have for a bus and volunteer as a dict
@@ -105,35 +142,12 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 
 # Encapsulating mainly for DRY later.
 def turn_bus_data_into_dict(bus, volunteer_phone_num):
-	bus_data_dict = {'bus_code_num': bus.bus_code_num, 'volunteer_phone_num': volunteer_phone_num,
-	                 'bus_safe_flag': bus.bus_safe_flag, 'bus_safe_time': str(bus.bus_safe_time),
-	                 'bus_expected_number_of_children': bus.bus_expected_number_of_children,
-	                 'bus_expected_number_of_adults': bus.bus_expected_number_of_adults,
-	                 'bus_number_food_packets_initial': bus.bus_number_food_packets_initial,
-	                 'bus_number_water_bottles_initial': bus.bus_number_water_bottles_initial,
-	                 'bus_started_from_depot_flag': bus.bus_started_from_depot_flag,
-	                 'bus_started_from_depot_time': str(bus.bus_started_from_depot_time),
-	                 'bus_first_aid_kit_available_flag': bus.bus_first_aid_kit_available_flag,
-	                 'bus_num_children_male_pickedup': bus.bus_num_children_male_pickedup,
-	                 'bus_num_children_female_pickedup': bus.bus_num_children_female_pickedup,
-	                 'bus_num_adults_male_pickedup': bus.bus_num_adults_male_pickedup,
-	                 'bus_num_adults_female_pickedup': bus.bus_num_adults_female_pickedup,
-	                 'all_deboarded_at_stadium_flag': bus.all_deboarded_at_stadium_flag,
-	                 'all_deboarded_at_stadium_time': str(bus.all_deboarded_at_stadium_time),
-	                 'num_children_male_seated': bus.num_children_male_seated,
-	                 'num_children_female_seated': bus.num_children_female_seated,
-	                 'num_adults_male_seated': bus.num_adults_male_seated,
-	                 'num_adults_female_seated': bus.num_adults_female_seated,
-	                 'bus_num_children_male_return_journey': bus.bus_num_children_male_return_journey,
-	                 'bus_num_children_female_return_journey': bus.bus_num_children_female_return_journey,
-	                 'bus_num_adults_male_return_journey': bus.bus_num_adults_male_return_journey,
-	                 'bus_num_adults_female_return_journey': bus.bus_num_adults_female_return_journey,
-	                 'everyone_dropped_off_flag': bus.everyone_dropped_off_flag,
-	                 'everyone_dropped_off_time': str(bus.everyone_dropped_off_time),
-	                 'feedback_form_taken_from_ngo_flag': bus.feedback_form_taken_from_ngo_flag,
-	                 'feedback_form_taken_from_ngo_time': str(bus.feedback_form_taken_from_ngo_time),
-	                 'bus_furthest_screen': bus.bus_furthest_screen
-	                 }
+	bus_data_dict = {}
+	for attr,value in bus.__dict__.iteritems():
+		if type(value) is not int:
+			value = str(value)
+		bus_data_dict[attr] = value
+	bus_data_dict['volunteer_phone_num'] = volunteer_phone_num
 	return bus_data_dict
 
 
