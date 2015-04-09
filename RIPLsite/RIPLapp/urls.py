@@ -6,6 +6,7 @@ urlpatterns = [  # Examples:  # url(r'^$', 'RIPLsite.views.home', name='home'),
                  url(r'screen3/$', 'RIPLapp.views.screen3bus_supply_count', name='screen3'),
                  url(r'screen4/$', 'RIPLapp.views.screen4bus_started_depot', name='screen4'),
                  url(r'screen5/$', 'RIPLapp.views.screen5_total_people_picked', name='screen5'),
-                 url(r'screentest/$', 'RIPLapp.views.screentest', name='screentest')
+                 url(r'screentest/$', 'RIPLapp.views.screentest', name='screentest'),
+                 url(r'screen6/$', 'RIPLapp.views.screen6_everyone_deboarded', name='screen6'),
 
 ]
