@@ -34,6 +34,14 @@ def get_bus_phone(request):
 		raise Exception(HttpResponse("Either bus_code_num or volunteer_phone_num doesn't exist in your "+request.method+" request."))
 
 @csrf_exempt
+def screentest(request):
+	if request.META.get('REMOTE_ADDR') != '127.0.0.1':
+		return HttpResponse("FORBIDDEN")
+	bus_code_num,volunteer_phone_num = get_bus_phone(request)
+	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
+	return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
 def screen1login_response(request):
 	bus_code_num,volunteer_phone_num = get_bus_phone(request)
 	#With the above function, the below if check is redundant, still keeping it as it is
@@ -53,7 +61,7 @@ def screen2bus_safe_response(request):
 				'bus_safe_time':time_now,
 				'bus_furthest_screen':2
 				}
-	auto_vars = ['bus_safe_time']
+	auto_vars = ['bus_safe_time','bus_safe_flag']
 	return screen_data_processing(request, screen2_vars, auto_vars)
 
 @csrf_exempt
