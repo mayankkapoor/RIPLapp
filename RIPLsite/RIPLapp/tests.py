@@ -47,7 +47,7 @@ class Screen2BusSafeTest(TestCase):
 		found = resolve(settings.APP_URL + '/screen2/')
 		self.assertEqual(found.func, screen2bus_safe_response)
 
-	#TODO: screen2 test isn't passing, likely due to test database not saving from live server url.
+	#TODO: screen2 test isn't passing, likely due to test database not saving into test database from app url.
 	# def test_screen2_saves_to_correct_bus(self):
 	# 	new_bus = Bus.objects.create(bus_code_num='correct_bus')
 	# 	new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
@@ -59,3 +59,11 @@ class Screen2BusSafeTest(TestCase):
 	# 	self.assertTrue(new_bus.bus_safe_flag)
 	# 	self.assertEqual(new_bus.bus_furthest_screen, 2)
 	# 	self.assertNotEqual(other_bus.bus_furthest_screen, 2)
+
+
+class Screen5TotalPeoplePickedTest(TestCase):
+	def test_url_resolves_to_screen1_view(self):
+		found = resolve(settings.APP_URL + '/screen5/')
+		self.assertEqual(found.func, screen5_total_people_picked)
+
+	#TODO: Screen 5 unit test
