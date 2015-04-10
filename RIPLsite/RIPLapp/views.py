@@ -196,3 +196,44 @@ def screen6_everyone_deboarded(request):
 	                }
 	auto_vars = ['all_deboarded_at_stadium_time']
 	return screen_data_processing(request, screen6_vars, auto_vars)
+
+@csrf_exempt
+def screen7_seated_at_stadium_count(request):
+        screen7_vars = {'num_children_male_seated': 0,
+                        'num_children_female_seated': 0,
+                        'num_adults_male_seated': 0,
+                        'num_adults_female_seated': 0,
+			'bus_furthest_screen': 7
+                        }
+        return screen_data_processing(request, screen7_vars)
+
+@csrf_exempt
+def screen8_seated_for_return_journey(request):
+        screen8_vars = {'bus_num_children_male_return_journey': 0,
+                        'bus_num_children_female_return_journey': 0,
+                        'bus_num_adults_male_return_journey': 0,
+                        'bus_num_adults_female_return_journey': 0,
+			'bus_furthest_screen': 8
+                        }
+        return screen_data_processing(request, screen8_vars)
+
+@csrf_exempt
+def screen9_everyone_deboarded_final(request):
+	time_now = timezone.now()
+        screen9_vars = {'everyone_dropped_off_flag': 0,
+                        'everyone_dropped_off_time': time_now,
+			'bus_furthest_screen': 9
+                        }
+	auto_vars = ['everyone_dropped_off_time']
+        return screen_data_processing(request, screen9_vars, auto_vars)
+
+@csrf_exempt
+def screen10_submitted_ngo_form(request):
+        time_now = timezone.now()
+        screen10_vars = {'feedback_form_taken_from_ngo_flag': 0,
+                         'feedback_form_taken_from_ngo_time': time_now,
+			 'bus_furthest_screen': 10
+                        }
+        auto_vars = ['feedback_form_taken_from_ngo_time']
+        return screen_data_processing(request, screen10_vars, auto_vars)
+

@@ -47,6 +47,7 @@ class OperatorConsoleTable(tables.Table):
     everyone_dropped_off_time = tables.Column(accessor='volunteer_bus.everyone_dropped_off_time')
     feedback_form_taken_from_ngo_flag = tables.Column(accessor='volunteer_bus.feedback_form_taken_from_ngo_flag')
     feedback_form_taken_from_ngo_time = tables.Column(accessor='volunteer_bus.feedback_form_taken_from_ngo_time')
+    bus_furthest_screen = tables.Column(accessor='volunteer_bus.bus_furthest_screen')
     bus_depot_zone = tables.Column(accessor='volunteer_bus.bus_depot.depot_zone')
     bus_depot_code = tables.Column(accessor='volunteer_bus.bus_depot.depot_code')
     bus_depot_name = tables.Column(accessor='volunteer_bus.bus_depot.depot_name')
