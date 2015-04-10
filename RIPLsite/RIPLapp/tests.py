@@ -150,3 +150,73 @@ class Screen5TotalPeoplePickedTest(TestCase):
 		self.assertEqual(found.func, screen5_total_people_picked)
 
 	#TODO: Screen 5 unit test
+	def test_screen5_saves_to_correct_bus(self):
+		new_bus = Bus.objects.create(bus_code_num='correct_bus')
+		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+		#It first needs to go to screen1 for creating the bus
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response, 'correct_bus')
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		self.assertContains(response, 'other_bus')
+		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
+		screen5_vars = {'bus_num_children_male_pickedup':0,
+				'bus_num_children_female_pickedup':0,
+				'bus_num_adults_male_pickedup':0,
+				'bus_num_adults_female_pickedup':0,
+				'bus_furthest_screen':6
+				}
+		for key in screen5_vars:
+			if 'num' in key:
+				correct_bus_dict.update({key: random.randint(1, 100)})
+			if 'flag' in key:
+				correct_bus_dict.update({key: random.randint(0, 1)})
+		response = self.client.post(settings.APP_URL + '/screen5/', correct_bus_dict)
+		self.assertContains(response, 'OK')
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		response_yaml = yaml.load(response.content)
+		for key in correct_bus_dict:
+			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		response_yaml = yaml.load(response.content)
+		for key in screen5_vars:
+			self.assertEqual(str(response_yaml[key]), str(None))
+
+
+class Screen6EveryoneDeboardedTest(TestCase):
+	def test_url_resolves_to_screen6_view(self):
+		found = resolve(settings.APP_URL + '/screen6/')
+		self.assertEqual(found.func, screen6_everyone_deboarded)
+
+	def test_screen6_saves_to_correct_bus(self):
+		new_bus = Bus.objects.create(bus_code_num='correct_bus')
+		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+		#It first needs to go to screen1 for creating the bus
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		self.assertContains(response, 'correct_bus')
+		response = self.client.post(settings.APP_URL + '/screen1/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		self.assertContains(response, 'other_bus')
+		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
+		time_now = timezone.now()
+		screen6_vars = {'all_deboarded_at_stadium_flag':0,
+						'all_deboarded_at_stadium_time':time_now,
+						'bus_furthest_screen':6
+						}
+		for key in screen6_vars:
+			if 'flag' in key:
+				correct_bus_dict.update({key: random.randint(0, 1)})
+		response = self.client.post(settings.APP_URL + '/screen6/', correct_bus_dict)
+		self.assertContains(response, 'OK')
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		response_yaml = yaml.load(response.content)
+		for key in correct_bus_dict:
+			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+
+		response = self.client.post(settings.APP_URL + '/screentest/', {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
+		response_yaml = yaml.load(response.content)
+		for key in screen6_vars:
+			self.assertEqual(str(response_yaml[key]), str(None))

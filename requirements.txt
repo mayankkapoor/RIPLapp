@@ -5,5 +5,6 @@ django-csvimport==2.4
 django-tables2==0.15.0
 gunicorn==19.3.0
 psycopg2==2.6
+PyYAML==3.11
 selenium==2.45.0
 six==1.9.0
