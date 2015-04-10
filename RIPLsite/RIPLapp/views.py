@@ -93,10 +93,18 @@ def screen_data_processing(request,screen_vars,auto_vars=[]):
 	auto_vars.append('bus_furthest_screen')
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	
+	to_be_deleted = []
 	for key in screen_vars: 
 		if key not in auto_vars:
-			screen_vars[key] = request_obtain(request, key)
-	
+			value = request_obtain(request, key)
+			if value == None:
+				to_be_deleted.append(key)
+			else:
+				screen_vars[key] = value
+	if len(to_be_deleted)>0:
+		for key in to_be_deleted:
+			del screen_vars[key]
+						
 	for key in screen_vars:
 		bus_screen_status += save_bus_param(bus_code_num, volunteer_phone_num, key, screen_vars[key])
 	
