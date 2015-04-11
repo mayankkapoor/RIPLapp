@@ -1,12 +1,13 @@
 {# Console.html. Central page for operators  #}
 {% load render_table from django_tables2 %}
+{% load static %}
 <!doctype html>
 <html>
     <title>
 	Operator Console
     </title>
     <head>
-	<link rel="stylesheet" href="/static/django_tables2/themes/paleblue/css/screen.css" />
+	<link rel="stylesheet" href="{% static 'paleblue/css/screen.css' %}" type="text/css" />
     </head>
     <body>
 	<h2>SOS</h2>
