@@ -220,3 +220,24 @@ class Screen6EveryoneDeboardedTest(TestCase):
 		response_yaml = yaml.load(response.content)
 		for key in screen6_vars:
 			self.assertEqual(str(response_yaml[key]), str(None))
+
+
+class SOSTest(TestCase):
+	def test_url_resolves_to_sos_view(self):
+		found = resolve(settings.APP_URL + '/sos/')
+		self.assertEqual(found.func, sos_report)
+
+	def test_sos_saves_properly(self):
+		correct_bus = Bus.objects.create(bus_code_num='correct_bus')
+		correct_volunteer = Volunteer.objects.create(volunteer_bus=correct_bus, volunteer_phone_num=1111111111)
+		other_bus = Bus.objects.create(bus_code_num='other_bus')
+		other_volunteer = Volunteer.objects.create(volunteer_bus=other_bus, volunteer_phone_num=2222222222)
+		# correct_sos = SOS.objects.create(sos_bus=correct_bus, sos_volunteer=correct_volunteer, sos_raise_time=timezone.now())
+		# other_sos = SOS.objects.create(sos_bus=other_bus, sos_volunteer=other_volunteer, sos_raise_time=timezone.now())
+
+		response = self.client.post(settings.APP_URL + '/sos/', {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+
+		self.assertContains(response, "correct_bus")
+		self.assertContains(response, "1111111111")
+		self.assertNotContains(response, "other_bus")
+		self.assertNotContains(response, "2222222222")

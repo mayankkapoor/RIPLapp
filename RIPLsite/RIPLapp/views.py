@@ -5,7 +5,7 @@ import sys
 import json
 from django.utils import timezone
 
-from RIPLapp.models import Volunteer, Bus
+from RIPLapp.models import Volunteer, Bus, SOS
 
 # Create your views here.
 
@@ -48,7 +48,7 @@ def screentest(request):
 def screen1login_response(request):
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	# With the above function, the below if check is redundant, still keeping it as it is
-	#TODO clean up the if check after verifying it's not required
+	# TODO clean up the if check after verifying it's not required
 	if bus_code_num and volunteer_phone_num:
 		# TODO: This allows association of a single phone w/ multiple buses, is it correct?
 		# MK: No. multiple phones for 1 bus is possible. Multiple buses per phone should not be possible.
@@ -77,7 +77,7 @@ def screen3bus_supply_count(request):
 	                'bus_number_food_packets_initial': 0,
 	                'bus_number_tickets_initial': 0,
 	                # There is some problem in toggling it back to false from True for the flags
-	                #Changed boolean to int to hack around toggle problem  # 0 = False, Non-zero=True
+	                # Changed boolean to int to hack around toggle problem  # 0 = False, Non-zero=True
 	                'bus_first_aid_kit_available_flag': 0,
 	                'everyone_dropped_off_flag': 0,
 	                'bus_furthest_screen': 3
@@ -88,7 +88,7 @@ def screen3bus_supply_count(request):
 @csrf_exempt
 def screen4bus_started_depot(request):
 	time_now = timezone.now()
-	screen4_vars = {'bus_started_from_depot_flag': 0, # Default is 0 or False
+	screen4_vars = {'bus_started_from_depot_flag': 0,  # Default is 0 or False
 	                'bus_started_from_depot_time': time_now,
 	                'bus_furthest_screen': 4
 	                }
@@ -102,17 +102,17 @@ def screen_data_processing(request, screen_vars, auto_vars=[]):
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	
 	to_be_deleted = []
-	for key in screen_vars: 
+	for key in screen_vars:
 		if key not in auto_vars:
 			value = request_obtain(request, key)
-			if value == None:
+			if not value:
 				to_be_deleted.append(key)
 			else:
 				screen_vars[key] = value
-	if len(to_be_deleted)>0:
+	if len(to_be_deleted) > 0:
 		for key in to_be_deleted:
 			del screen_vars[key]
-						
+
 	for key in screen_vars:
 		bus_screen_status += save_bus_param(bus_code_num, volunteer_phone_num, key, screen_vars[key])
 	
@@ -128,13 +128,13 @@ def save_bus_param(bus_code_num, volunteer_phone_num, param, param_value):
 	query_buses = Bus.objects.filter(bus_code_num=bus_code_num, volunteer__volunteer_phone_num=volunteer_phone_num)
 	if query_buses.count() == 0:
 		# This call should always be on a pre existing bus
-		#If a bus does not exist its an error
+		# If a bus does not exist its an error
 		return 1
 	elif query_buses.count() == 1:
 		bus = query_buses[0]
 		setattr(bus, param, param_value)
 		bus.save()
-		if (getattr(bus, param) == param_value):
+		if getattr(bus, param) == param_value:
 			return 0
 		else:
 			return 1
@@ -205,43 +205,61 @@ def screen6_everyone_deboarded(request):
 	auto_vars = ['all_deboarded_at_stadium_time']
 	return screen_data_processing(request, screen6_vars, auto_vars)
 
+
 @csrf_exempt
 def screen7_seated_at_stadium_count(request):
-        screen7_vars = {'num_children_male_seated': 0,
-                        'num_children_female_seated': 0,
-                        'num_adults_male_seated': 0,
-                        'num_adults_female_seated': 0,
-			'bus_furthest_screen': 7
-                        }
-        return screen_data_processing(request, screen7_vars)
+	screen7_vars = {'num_children_male_seated': 0,
+	                'num_children_female_seated': 0,
+	                'num_adults_male_seated': 0,
+	                'num_adults_female_seated': 0,
+	                'bus_furthest_screen': 7
+	                }
+	return screen_data_processing(request, screen7_vars)
+
 
 @csrf_exempt
 def screen8_seated_for_return_journey(request):
-        screen8_vars = {'bus_num_children_male_return_journey': 0,
-                        'bus_num_children_female_return_journey': 0,
-                        'bus_num_adults_male_return_journey': 0,
-                        'bus_num_adults_female_return_journey': 0,
-			'bus_furthest_screen': 8
-                        }
-        return screen_data_processing(request, screen8_vars)
+	screen8_vars = {'bus_num_children_male_return_journey': 0,
+	                'bus_num_children_female_return_journey': 0,
+	                'bus_num_adults_male_return_journey': 0,
+	                'bus_num_adults_female_return_journey': 0,
+	                'bus_furthest_screen': 8
+	                }
+	return screen_data_processing(request, screen8_vars)
+
 
 @csrf_exempt
 def screen9_everyone_deboarded_final(request):
 	time_now = timezone.now()
-        screen9_vars = {'everyone_dropped_off_flag': 0,
-                        'everyone_dropped_off_time': time_now,
-			'bus_furthest_screen': 9
-                        }
+	screen9_vars = {'everyone_dropped_off_flag': 0,
+	                'everyone_dropped_off_time': time_now,
+	                'bus_furthest_screen': 9
+	                }
 	auto_vars = ['everyone_dropped_off_time']
-        return screen_data_processing(request, screen9_vars, auto_vars)
+	return screen_data_processing(request, screen9_vars, auto_vars)
+
 
 @csrf_exempt
 def screen10_submitted_ngo_form(request):
-        time_now = timezone.now()
-        screen10_vars = {'feedback_form_taken_from_ngo_flag': 0,
-                         'feedback_form_taken_from_ngo_time': time_now,
-			 'bus_furthest_screen': 10
-                        }
-        auto_vars = ['feedback_form_taken_from_ngo_time']
-        return screen_data_processing(request, screen10_vars, auto_vars)
+	time_now = timezone.now()
+	screen10_vars = {'feedback_form_taken_from_ngo_flag': 0,
+	                 'feedback_form_taken_from_ngo_time': time_now,
+	                 'bus_furthest_screen': 10
+	                 }
+	auto_vars = ['feedback_form_taken_from_ngo_time']
+	return screen_data_processing(request, screen10_vars, auto_vars)
 
+
+@csrf_exempt
+def sos_report(request):
+	time_now = timezone.now()
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	query_buses = Bus.objects.filter(bus_code_num=bus_code_num, volunteer__volunteer_phone_num=volunteer_phone_num)
+	if query_buses.count() == 1:
+		sos_volunteer = Volunteer.objects.get(volunteer_phone_num=volunteer_phone_num, volunteer_bus=query_buses[0])
+		new_sos = SOS.objects.create(sos_bus=query_buses[0], sos_volunteer=sos_volunteer, sos_raise_time=time_now)
+	else:
+		raise Exception("Error: Sos query_buses did not return a unique bus. Somethings off.")
+	return HttpResponse("SOS with bus code {0:s} & volunteer phone number {1:s} saved at {2:s}.".format(new_sos.sos_bus,
+	                                                                                                    new_sos.sos_volunteer,
+	                                                                                                    str(new_sos.sos_raise_time)))
