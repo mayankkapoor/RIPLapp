@@ -13,5 +13,6 @@ urlpatterns = [  # Examples:  # url(r'^$', 'RIPLsite.views.home', name='home'),
                  url(r'screen9/$', 'RIPLapp.views.screen9_everyone_deboarded_final', name='screen9'),
                  url(r'screen10/$', 'RIPLapp.views.screen10_submitted_ngo_form', name='screen10'),
                  url(r'sos/$', 'RIPLapp.views.sos_report', name='sos_report'),
+                 url(r'location/$', 'RIPLapp.views.location_report', name='location_report'),
 
                  ]
