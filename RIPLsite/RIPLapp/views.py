@@ -38,7 +38,7 @@ def get_bus_phone(request):
 @csrf_exempt
 def screentest(request):
 	# if request.META.get('REMOTE_ADDR') != '127.0.0.1':
-	# 		return HttpResponse("FORBIDDEN")
+	# return HttpResponse("FORBIDDEN")
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 	return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -172,6 +172,7 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 		print 'Oops, %s did not complete. Exception: %s' % (sys._getframe().f_code.co_name, e)
 		raise
 
+
 # Encapsulating mainly for DRY later.
 def turn_bus_data_into_dict(bus, volunteer_phone_num):
 	bus_data_dict = {}
@@ -278,3 +279,18 @@ def sos_report(request):
 	                                                                                                    new_sos.sos_volunteer,
 	                                                                                                    str(
 		                                                                                                    new_sos.sos_raise_time)))
+
+
+@csrf_exempt
+def location_report(request):
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	query_buses = Bus.objects.filter(bus_code_num=bus_code_num, volunteer__volunteer_phone_num=volunteer_phone_num)
+	if query_buses.count() == 1:
+		bus = query_buses[0]
+		bus.bus_last_location_latitude = request_obtain(request, 'bus_last_location_latitude')
+		bus.bus_last_location_longitude = request_obtain(request, 'bus_last_location_longitude')
+		bus.save()
+	else:
+		raise Exception("Error: location_report query_buses did not return a unique bus. Somethings off.")
+	return HttpResponse(
+		"Location saved with lat: %s & long: %s" % (bus.bus_last_location_latitude, bus.bus_last_location_longitude))
