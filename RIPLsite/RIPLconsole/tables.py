@@ -1,5 +1,5 @@
 import django_tables2 as tables
-from RIPLapp.models import Depot, Bus, Volunteer, SOS
+from RIPLapp.models import Volunteer, SOS
 from django.utils.safestring import mark_safe
 
 
@@ -71,7 +71,11 @@ class OperatorConsoleTable(tables.Table):
 		else:
 			return mark_safe('<span style="background-color: green">%s</span>' % value);
 
+	def render_volunteer_bus(self, value):
+		return value.bus_code_num
+
 	class Meta:
 		model = Volunteer
 		# add class="paleblue" to <table> tag
 		attrs = {"class": "paleblue"}
+		sequence = ("volunteer_bus", "...")
