@@ -53,8 +53,7 @@ class Bus(models.Model):
 
 
 class Volunteer(models.Model):
-	volunteer_phone_num = models.BigIntegerField(primary_key=True,
-	                                             validators=[MaxLengthValidator(10), MinLengthValidator(10)])
+	volunteer_phone_num = models.BigIntegerField(primary_key=True)
 	volunteer_full_name = models.CharField(max_length=200, null=True, blank=True)
 	volunteer_bus = models.ForeignKey(Bus, null=False)
 
