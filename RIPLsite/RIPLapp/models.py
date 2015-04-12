@@ -13,8 +13,7 @@ class Depot(models.Model):
 
 
 class Bus(models.Model):
-	bus_code_num = models.CharField(max_length=20,
-	                                primary_key=True)  # TODO: Is setting using bus_code_num as primary_key correct? There may be two rows with same bus number but different volunteers
+	bus_code_num = models.CharField(max_length=20)
 	bus_safe_flag = models.IntegerField(null=True, blank=True)
 	bus_safe_time = models.DateTimeField(null=True, blank=True)  # UTC time
 	bus_expected_number_of_children = models.IntegerField(null=True, blank=True)
