@@ -45,8 +45,8 @@ class Bus(models.Model):
 	feedback_form_taken_from_ngo_time = models.DateTimeField(null=True, blank=True)  # UTC time
 	bus_depot = models.ForeignKey(Depot, null=True, blank=True)
 	bus_furthest_screen = models.IntegerField(null=True, blank=True)
-	bus_last_location_latitude = models.DecimalField(null=True, decimal_places=4, max_digits=10, default=None)
-	bus_last_location_longitude = models.DecimalField(null=True, decimal_places=4, max_digits=10, default=None)
+	bus_last_location_latitude = models.DecimalField(null=True, blank=True, decimal_places=4, max_digits=10, default=None)
+	bus_last_location_longitude = models.DecimalField(null=True, blank=True, decimal_places=4, max_digits=10, default=None)
 
 	def __unicode__(self):  # __unicode__ on Python 2
 		return u'%s-%s' % (self.bus_code_num, self.volunteer_set.all())
