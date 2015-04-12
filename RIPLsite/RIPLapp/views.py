@@ -37,8 +37,8 @@ def get_bus_phone(request):
 
 @csrf_exempt
 def screentest(request):
-# 	if request.META.get('REMOTE_ADDR') != '127.0.0.1':
-# 		return HttpResponse("FORBIDDEN")
+	# if request.META.get('REMOTE_ADDR') != '127.0.0.1':
+	# 		return HttpResponse("FORBIDDEN")
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 	return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -170,7 +170,7 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 		return bus_data_dict
 	except Exception, e:
 		print 'Oops, %s did not complete. Exception: %s' % (sys._getframe().f_code.co_name, e)
-
+		raise
 
 # Encapsulating mainly for DRY later.
 def turn_bus_data_into_dict(bus, volunteer_phone_num):
