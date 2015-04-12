@@ -37,8 +37,8 @@ def get_bus_phone(request):
 
 @csrf_exempt
 def screentest(request):
-	if request.META.get('REMOTE_ADDR') != '127.0.0.1':
-		return HttpResponse("FORBIDDEN")
+# 	if request.META.get('REMOTE_ADDR') != '127.0.0.1':
+# 		return HttpResponse("FORBIDDEN")
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
 	return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -113,7 +113,7 @@ def screen_data_processing(request, screen_vars, auto_vars=[]):
 			if not value:
 				to_be_deleted.append(key)
 			else:
-				screen_vars[key] = value
+				screen_vars[key] = value.strip()
 	if len(to_be_deleted) > 0:
 		for key in to_be_deleted:
 			del screen_vars[key]
