@@ -61,7 +61,7 @@ class OperatorConsoleTable(tables.Table):
 	    return mark_safe('<span style="background-color: green">%s</span>' % value);
 
     def render_bus_first_aid_kit_available_flag(self, value):
-        if value is False:
+        if value is 0:
             return mark_safe('<span style="background-color: red">%s</span>' % value);
         else:
             return mark_safe('<span style="background-color: green">%s</span>' % value);

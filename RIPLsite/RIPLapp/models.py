@@ -49,7 +49,7 @@ class Bus(models.Model):
 	bus_furthest_screen = models.IntegerField(null=True, blank=True)
 
 	def __unicode__(self):  # __unicode__ on Python 2
-		return u'%s' % self.bus_code_num
+		return u'%s-%s' % (self.bus_code_num, self.volunteer_set.all())
 
 
 class Volunteer(models.Model):
