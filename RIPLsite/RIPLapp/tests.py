@@ -1,17 +1,21 @@
+import random
+import decimal
+
 from django.test import TestCase
 from django.core.urlresolvers import resolve
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest
 from django.template.loader import render_to_string
+import yaml
+from django.utils import timezone
 
 from RIPLapp.views import *
 from RIPLapp.models import Bus, Volunteer
 from RIPLsite import settings
-import random
-import yaml
-from django.utils import timezone
+
 # Create your tests here.
 
 time_now = timezone.now()
+
 
 class HomePageTest(TestCase):
 	def test_root_url_resolves_to_home_page_view(self):
@@ -30,7 +34,7 @@ class Screen1LoginTest(TestCase):
 		found = resolve(settings.APP_URL + '/screen1/')
 		self.assertEqual(found.func, screen1login_response)
 
-	def test_response_data_dict_returns_correct_bus(self):
+	def test_screen1_saves_correct_bus(self):
 		new_bus = Bus.objects.create(bus_code_num='correct_bus', bus_expected_number_of_children=1)
 		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
 		other_bus = Bus.objects.create(bus_code_num='other_bus')
@@ -63,17 +67,36 @@ class Screen2BusSafeTest(TestCase):
 		response = self.client.post(settings.APP_URL + '/screen1/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
 		self.assertContains(response, 'other_bus')
-		response = self.client.post(settings.APP_URL + '/screen2/',
-		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
+		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
+		screen_vars = {'bus_safe_flag': 0,
+		               'bus_safe_time': time_now,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
+		               'bus_furthest_screen': 2
+		               }
+		for key in screen_vars:
+			if 'num' in key:
+				correct_bus_dict.update({key: random.randint(1, 100)})
+			if 'flag' in key:
+				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
+		response = self.client.post(settings.APP_URL + '/screen2/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
-		self.assertContains(response, '"bus_safe_flag": "True"')
-		self.assertContains(response, '"bus_code_num": "correct_bus"')
-		self.assertContains(response, '"bus_furthest_screen": 2')
+		response_yaml = yaml.load(response.content)
+		for key in correct_bus_dict:
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
-		self.assertContains(response, '"bus_furthest_screen": "None"')
+		response_yaml = yaml.load(response.content)
+		for key in screen_vars:
+			self.assertEqual(str(response_yaml[key]), str(None))
 
 
 class Screen3BusSupplyCountTest(TestCase):
@@ -94,29 +117,36 @@ class Screen3BusSupplyCountTest(TestCase):
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
 		self.assertContains(response, 'other_bus')
 		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
-		screen3_vars = {'bus_number_water_bottles_initial': 0,
-		                'bus_number_food_packets_initial': 0,
-		                'bus_number_tickets_initial': 0,
-		                'bus_first_aid_kit_available_flag': 0,  # 'everyone_dropped_off_flag':0,
-		                'bus_furthest_screen': 3
-		                }
-		for key in screen3_vars:
+		screen_vars = {'bus_number_water_bottles_initial': 0,
+		               'bus_number_food_packets_initial': 0,
+		               'bus_number_tickets_initial': 0,
+		               'bus_first_aid_kit_available_flag': 0,  # 'everyone_dropped_off_flag':0,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
+		               'bus_furthest_screen': 3
+		               }
+		for key in screen_vars:
 			if 'number' in key:
 				correct_bus_dict.update({key: random.randint(1, 100)})
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
 		response = self.client.post(settings.APP_URL + '/screen3/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
 		response_yaml = yaml.load(response.content)
-		for key in screen3_vars:
+		for key in screen_vars:
 			self.assertEqual(str(response_yaml[key]), str(None))
 
 
@@ -139,25 +169,32 @@ class Screen4BusdepotstartedTest(TestCase):
 		self.assertContains(response, 'other_bus')
 		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
 		time_now = timezone.now()
-		screen4_vars = {'bus_started_from_depot_flag': 0,
-		                'bus_started_from_depot_time': time_now,
-		                'bus_furthest_screen': 4
-		                }
-		for key in screen4_vars:
+		screen_vars = {'bus_started_from_depot_flag': 0,
+		               'bus_started_from_depot_time': time_now,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
+		               'bus_furthest_screen': 4
+		               }
+		for key in screen_vars:
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
 		response = self.client.post(settings.APP_URL + '/screen4/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
 		response_yaml = yaml.load(response.content)
-		for key in screen4_vars:
+		for key in screen_vars:
 			self.assertEqual(str(response_yaml[key]), str(None))
 
 
@@ -179,29 +216,36 @@ class Screen5TotalPeoplePickedTest(TestCase):
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
 		self.assertContains(response, 'other_bus')
 		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
-		screen5_vars = {'bus_num_children_male_pickedup': 0,
-		                'bus_num_children_female_pickedup': 0,
-		                'bus_num_adults_male_pickedup': 0,
-		                'bus_num_adults_female_pickedup': 0,
-		                'bus_furthest_screen': 6
-		                }
-		for key in screen5_vars:
+		screen_vars = {'bus_num_children_male_pickedup': 0,
+		               'bus_num_children_female_pickedup': 0,
+		               'bus_num_adults_male_pickedup': 0,
+		               'bus_num_adults_female_pickedup': 0,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
+		               'bus_furthest_screen': 5
+		               }
+		for key in screen_vars:
 			if 'num' in key:
 				correct_bus_dict.update({key: random.randint(1, 100)})
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
 		response = self.client.post(settings.APP_URL + '/screen5/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
 		response_yaml = yaml.load(response.content)
-		for key in screen5_vars:
+		for key in screen_vars:
 			self.assertEqual(str(response_yaml[key]), str(None))
 
 
@@ -225,18 +269,25 @@ class Screen6EveryoneDeboardedTest(TestCase):
 		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
 		screen6_vars = {'all_deboarded_at_stadium_flag': 0,
 		                'all_deboarded_at_stadium_time': time_now,
+		                'bus_last_location_latitude': 0.0,
+		                'bus_last_location_longitude': 0.0,
 		                'bus_furthest_screen': 6
 		                }
 		for key in screen6_vars:
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
 		response = self.client.post(settings.APP_URL + '/screen6/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
@@ -289,6 +340,8 @@ class Screen7SeatedAtStadiumTest(TestCase):
 		               'num_children_female_seated': 0,
 		               'num_adults_male_seated': 0,
 		               'num_adults_female_seated': 0,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
 		               'bus_furthest_screen': 7
 		               }
 		for key in screen_vars:
@@ -296,13 +349,19 @@ class Screen7SeatedAtStadiumTest(TestCase):
 				correct_bus_dict.update({key: random.randint(1, 100)})
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
+
 		response = self.client.post(settings.APP_URL + '/screen7/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
@@ -333,6 +392,8 @@ class Screen8SeatedReturnJourneyTest(TestCase):
 		               'bus_num_children_female_return_journey': 0,
 		               'bus_num_adults_male_return_journey': 0,
 		               'bus_num_adults_female_return_journey': 0,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
 		               'bus_furthest_screen': 8
 		               }
 		for key in screen_vars:
@@ -340,13 +401,19 @@ class Screen8SeatedReturnJourneyTest(TestCase):
 				correct_bus_dict.update({key: random.randint(1, 100)})
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
+
 		response = self.client.post(settings.APP_URL + '/screen8/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
@@ -360,7 +427,7 @@ class Screen9EveryoneDeboardedTest(TestCase):
 		found = resolve(settings.APP_URL + '/screen9/')
 		self.assertEqual(found.func, screen9_everyone_deboarded_final)
 
-	def test_screen_saves_to_correct_bus(self):
+	def test_screen9_saves_to_correct_bus(self):
 		new_bus = Bus.objects.create(bus_code_num='correct_bus')
 		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
 		other_bus = Bus.objects.create(bus_code_num='other_bus')
@@ -375,6 +442,8 @@ class Screen9EveryoneDeboardedTest(TestCase):
 		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
 		screen_vars = {'everyone_dropped_off_flag': 0,
 		               'everyone_dropped_off_time': time_now,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
 		               'bus_furthest_screen': 9
 		               }
 		for key in screen_vars:
@@ -382,13 +451,19 @@ class Screen9EveryoneDeboardedTest(TestCase):
 				correct_bus_dict.update({key: random.randint(1, 100)})
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
+
 		response = self.client.post(settings.APP_URL + '/screen9/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
@@ -402,7 +477,7 @@ class Screen10SubmitNGOFormTest(TestCase):
 		found = resolve(settings.APP_URL + '/screen10/')
 		self.assertEqual(found.func, screen10_submitted_ngo_form)
 
-	def test_screen_saves_to_correct_bus(self):
+	def test_screen10_saves_to_correct_bus(self):
 		new_bus = Bus.objects.create(bus_code_num='correct_bus')
 		new_volunteer = Volunteer.objects.create(volunteer_bus=new_bus, volunteer_phone_num=1111111111)
 		other_bus = Bus.objects.create(bus_code_num='other_bus')
@@ -417,6 +492,8 @@ class Screen10SubmitNGOFormTest(TestCase):
 		correct_bus_dict = {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111}
 		screen_vars = {'feedback_form_taken_from_ngo_flag': 0,
 		               'feedback_form_taken_from_ngo_time': time_now,
+		               'bus_last_location_latitude': 0.0,
+		               'bus_last_location_longitude': 0.0,
 		               'bus_furthest_screen': 10
 		               }
 		for key in screen_vars:
@@ -424,13 +501,19 @@ class Screen10SubmitNGOFormTest(TestCase):
 				correct_bus_dict.update({key: random.randint(1, 100)})
 			if 'flag' in key:
 				correct_bus_dict.update({key: random.randint(0, 1)})
+			if 'location' in key:
+				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
+
 		response = self.client.post(settings.APP_URL + '/screen10/', correct_bus_dict)
 		self.assertContains(response, 'OK')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
 		for key in correct_bus_dict:
-			self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
+			if 'location' in key:
+				self.assertEqual(decimal.Decimal(response_yaml[key]), decimal.Decimal(correct_bus_dict[key]))
+			else:
+				self.assertEqual(str(response_yaml[key]), str(correct_bus_dict[key]))
 
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'other_bus', 'volunteer_phone_num': 2222222222})
