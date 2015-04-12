@@ -65,9 +65,11 @@ def screen2bus_safe_response(request):
 	time_now = timezone.now()
 	screen2_vars = {'bus_safe_flag': 1,
 	                'bus_safe_time': time_now,
-	                'bus_furthest_screen': 2
+	                'bus_furthest_screen': 2,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
-	auto_vars = ['bus_safe_time', 'bus_safe_flag']
+	auto_vars = ['bus_safe_time']
 	return screen_data_processing(request, screen2_vars, auto_vars)
 
 
@@ -78,9 +80,10 @@ def screen3bus_supply_count(request):
 	                'bus_number_tickets_initial': 0,
 	                # There is some problem in toggling it back to false from True for the flags
 	                # Changed boolean to int to hack around toggle problem  # 0 = False, Non-zero=True
-	                'bus_first_aid_kit_available_flag': 0,
-	                'everyone_dropped_off_flag': 0,
-	                'bus_furthest_screen': 3
+	                'bus_first_aid_kit_available_flag': 0,  # 'everyone_dropped_off_flag': 0,
+	                'bus_furthest_screen': 3,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
 	return screen_data_processing(request, screen3_vars)
 
@@ -90,7 +93,9 @@ def screen4bus_started_depot(request):
 	time_now = timezone.now()
 	screen4_vars = {'bus_started_from_depot_flag': 0,  # Default is 0 or False
 	                'bus_started_from_depot_time': time_now,
-	                'bus_furthest_screen': 4
+	                'bus_furthest_screen': 4,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
 	auto_vars = ['bus_started_from_depot_time']
 	return screen_data_processing(request, screen4_vars, auto_vars)
@@ -181,18 +186,17 @@ def turn_bus_data_into_dict(bus, volunteer_phone_num):
 # Screen 5 total people picked after last checkpoint
 @csrf_exempt
 def screen5_total_people_picked(request):
-	bus_code_num, volunteer_phone_num = get_bus_phone(request)
-	bus_num_children_male_pickedup = request_obtain(request, 'bus_num_children_male_pickedup')
-	bus_num_children_female_pickedup = request_obtain(request, 'bus_num_children_female_pickedup')
-	bus_num_adults_male_pickedup = request_obtain(request, 'bus_num_adults_male_pickedup')
-	bus_num_adults_female_pickedup = request_obtain(request, 'bus_num_adults_female_pickedup')
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_children_male_pickedup', bus_num_children_male_pickedup)
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_children_female_pickedup',
-	               bus_num_children_female_pickedup)
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_adults_male_pickedup', bus_num_adults_male_pickedup)
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_num_adults_female_pickedup', bus_num_adults_female_pickedup)
-	save_bus_param(bus_code_num, volunteer_phone_num, 'bus_furthest_screen', 5)
-	return HttpResponse("OK")  # There is no need to return complete bus data for screens 2-12.
+	time_now = timezone.now()
+	screen5_vars = {'bus_num_children_male_pickedup': 0,
+	                'bus_num_children_female_pickedup': time_now,
+	                'bus_num_adults_male_pickedup': 0,
+	                'bus_num_adults_female_pickedup': 0,
+	                'bus_furthest_screen': 6,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
+	                }
+	auto_vars = ['all_deboarded_at_stadium_time']
+	return screen_data_processing(request, screen5_vars, auto_vars)
 
 
 @csrf_exempt
@@ -200,7 +204,9 @@ def screen6_everyone_deboarded(request):
 	time_now = timezone.now()
 	screen6_vars = {'all_deboarded_at_stadium_flag': 0,
 	                'all_deboarded_at_stadium_time': time_now,
-	                'bus_furthest_screen': 6
+	                'bus_furthest_screen': 6,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
 	auto_vars = ['all_deboarded_at_stadium_time']
 	return screen_data_processing(request, screen6_vars, auto_vars)
@@ -212,7 +218,9 @@ def screen7_seated_at_stadium_count(request):
 	                'num_children_female_seated': 0,
 	                'num_adults_male_seated': 0,
 	                'num_adults_female_seated': 0,
-	                'bus_furthest_screen': 7
+	                'bus_furthest_screen': 7,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
 	return screen_data_processing(request, screen7_vars)
 
@@ -223,7 +231,9 @@ def screen8_seated_for_return_journey(request):
 	                'bus_num_children_female_return_journey': 0,
 	                'bus_num_adults_male_return_journey': 0,
 	                'bus_num_adults_female_return_journey': 0,
-	                'bus_furthest_screen': 8
+	                'bus_furthest_screen': 8,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
 	return screen_data_processing(request, screen8_vars)
 
@@ -233,7 +243,9 @@ def screen9_everyone_deboarded_final(request):
 	time_now = timezone.now()
 	screen9_vars = {'everyone_dropped_off_flag': 0,
 	                'everyone_dropped_off_time': time_now,
-	                'bus_furthest_screen': 9
+	                'bus_furthest_screen': 9,
+	                'bus_last_location_latitude': 0.0,
+	                'bus_last_location_longitude': 0.0
 	                }
 	auto_vars = ['everyone_dropped_off_time']
 	return screen_data_processing(request, screen9_vars, auto_vars)
@@ -244,7 +256,9 @@ def screen10_submitted_ngo_form(request):
 	time_now = timezone.now()
 	screen10_vars = {'feedback_form_taken_from_ngo_flag': 0,
 	                 'feedback_form_taken_from_ngo_time': time_now,
-	                 'bus_furthest_screen': 10
+	                 'bus_furthest_screen': 10,
+	                 'bus_last_location_latitude': 0.0,
+	                 'bus_last_location_longitude': 0.0
 	                 }
 	auto_vars = ['feedback_form_taken_from_ngo_time']
 	return screen_data_processing(request, screen10_vars, auto_vars)
@@ -262,4 +276,5 @@ def sos_report(request):
 		raise Exception("Error: Sos query_buses did not return a unique bus. Somethings off.")
 	return HttpResponse("SOS with bus code {0:s} & volunteer phone number {1:s} saved at {2:s}.".format(new_sos.sos_bus,
 	                                                                                                    new_sos.sos_volunteer,
-	                                                                                                    str(new_sos.sos_raise_time)))
+	                                                                                                    str(
+		                                                                                                    new_sos.sos_raise_time)))

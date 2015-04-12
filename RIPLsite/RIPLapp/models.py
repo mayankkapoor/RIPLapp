@@ -17,7 +17,7 @@ class Depot(models.Model):
 class Bus(models.Model):
 	bus_code_num = models.CharField(max_length=20,
 	                                primary_key=True)  # TODO: Is setting using bus_code_num as primary_key correct? There may be two rows with same bus number but different volunteers
-	bus_safe_flag = models.NullBooleanField(null=True, blank=True)
+	bus_safe_flag = models.IntegerField(null=True, blank=True)
 	bus_safe_time = models.DateTimeField(null=True, blank=True)  # UTC time
 	bus_expected_number_of_children = models.IntegerField(null=True, blank=True)
 	bus_expected_number_of_adults = models.IntegerField(null=True, blank=True)
@@ -47,6 +47,8 @@ class Bus(models.Model):
 	feedback_form_taken_from_ngo_time = models.DateTimeField(null=True, blank=True)  # UTC time
 	bus_depot = models.ForeignKey(Depot, null=True, blank=True)
 	bus_furthest_screen = models.IntegerField(null=True, blank=True)
+	bus_last_location_latitude = models.DecimalField(null=True, decimal_places=4, max_digits=10)
+	bus_last_location_longitude = models.DecimalField(null=True, decimal_places=4, max_digits=10)
 
 	def __unicode__(self):  # __unicode__ on Python 2
 		return u'%s-%s' % (self.bus_code_num, self.volunteer_set.all())
