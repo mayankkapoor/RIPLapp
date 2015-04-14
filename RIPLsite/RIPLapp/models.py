@@ -13,7 +13,7 @@ class Depot(models.Model):
 
 
 class Bus(models.Model):
-	bus_code_num = models.CharField(max_length=20)
+	bus_code_num = models.CharField(max_length=20, primary_key=True)
 	bus_safe_flag = models.IntegerField(null=True, blank=True)
 	bus_safe_time = models.DateTimeField(null=True, blank=True)  # UTC time
 	bus_expected_number_of_children = models.IntegerField(null=True, blank=True)
