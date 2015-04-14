@@ -13,6 +13,9 @@ class SOSTable(tables.Table):
 	def render_sos_raise_time(self, value):
 		return mark_safe('<span style="background-color: red">%s</span>' % value);
 
+	def render_sos_bus(self, value):
+		return value.bus_code_num
+
 	class Meta:
 		model = SOS
 		# add class="paleblue" to <table> tag
@@ -22,6 +25,9 @@ class SOSTable(tables.Table):
 # Fundamentally the root of all ForeignKeys comes from Volunteers, so using that as the base model
 # for the table and deriving all the associated Bus properties via the ForeignKey 'accessor'
 class OperatorConsoleTable(tables.Table):
+	bus_depot_zone = tables.Column(accessor='volunteer_bus.bus_depot.depot_zone')
+	bus_depot_code = tables.Column(accessor='volunteer_bus.bus_depot.depot_code')
+	bus_depot_name = tables.Column(accessor='volunteer_bus.bus_depot.depot_name')
 	bus_safe_flag = tables.Column(accessor='volunteer_bus.bus_safe_flag')
 	bus_safe_time = tables.Column(accessor='volunteer_bus.bus_safe_time')
 	bus_expected_number_of_children = tables.Column(accessor='volunteer_bus.bus_expected_number_of_children')
@@ -52,9 +58,6 @@ class OperatorConsoleTable(tables.Table):
 	feedback_form_taken_from_ngo_flag = tables.Column(accessor='volunteer_bus.feedback_form_taken_from_ngo_flag')
 	feedback_form_taken_from_ngo_time = tables.Column(accessor='volunteer_bus.feedback_form_taken_from_ngo_time')
 	bus_furthest_screen = tables.Column(accessor='volunteer_bus.bus_furthest_screen')
-	bus_depot_zone = tables.Column(accessor='volunteer_bus.bus_depot.depot_zone')
-	bus_depot_code = tables.Column(accessor='volunteer_bus.bus_depot.depot_code')
-	bus_depot_name = tables.Column(accessor='volunteer_bus.bus_depot.depot_name')
 	bus_last_location_latitude = tables.Column(accessor='volunteer_bus.bus_last_location_latitude')
 	bus_last_location_longitude = tables.Column(accessor='volunteer_bus.bus_last_location_longitude')
 
@@ -78,4 +81,4 @@ class OperatorConsoleTable(tables.Table):
 		model = Volunteer
 		# add class="paleblue" to <table> tag
 		attrs = {"class": "paleblue"}
-		sequence = ("volunteer_bus", "...")
+		sequence = ("bus_depot_zone", "bus_depot_code", "bus_depot_name", "volunteer_bus", "...")
