@@ -275,7 +275,7 @@ def sos_report(request):
 		new_sos = SOS.objects.create(sos_bus=query_buses[0], sos_volunteer=sos_volunteer, sos_raise_time=time_now)
 	else:
 		raise Exception("Error: Sos query_buses did not return a unique bus. Somethings off.")
-	return HttpResponse("SOS with bus code {0:s} & volunteer phone number {1:s} saved at {2:s}.".format(new_sos.sos_bus,
+	return HttpResponse("SOS with bus code {0:s} & volunteer phone number {1:s} saved at {2:s}.".format(new_sos.sos_bus.bus_code_num,
 	                                                                                                    new_sos.sos_volunteer,
 	                                                                                                    str(
 		                                                                                                    new_sos.sos_raise_time)))
