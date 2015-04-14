@@ -42,7 +42,8 @@ INSTALLED_APPS = (
 	'RIPLapp',
 	'RIPLconsole',
 	'csvimport.app.CSVImportConf',
-	'django_tables2'
+	'django_tables2',
+	'django_filters'
 )
 
 MIDDLEWARE_CLASSES = (

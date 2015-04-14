@@ -2,7 +2,6 @@ import django_tables2 as tables
 from RIPLapp.models import Volunteer, SOS
 from django.utils.safestring import mark_safe
 
-
 class SOSTable(tables.Table):
 	def render_sos_bus(self, value):
 		return mark_safe('<span style="background-color: red">%s</span>' % value);
