@@ -13,6 +13,15 @@
 	<h2>SOS</h2>
 	{% render_table sos %}
 	<h2>Tracking</h2>
+	{% block volunteercontent %}
+                <form action="" method="get">
+                        {{ vol_filter.form.as_p }} <input type="Submit" />
+                </form>
+                <!--{% for obj in my_filter %}
+                        {{ obj.volunteer_bus.bus_depot.depot_zone }} - <br />
+                {% endfor %}--!>
+        {% endblock %}
+	<br/>
         {% render_table tracking %}
     </body>
 </html>

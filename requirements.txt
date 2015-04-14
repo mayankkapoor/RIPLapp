@@ -2,6 +2,7 @@ chardet==2.3.0
 dj-database-url==0.3.0
 Django==1.8
 django-csvimport==2.4
+django-filter==0.9.2
 django-tables2==0.15.0
 gunicorn==19.3.0
 psycopg2==2.6
