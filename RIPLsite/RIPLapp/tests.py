@@ -314,6 +314,7 @@ class SOSTest(TestCase):
 
 		self.assertContains(response, "correct_bus")
 		self.assertContains(response, "1111111111")
+		self.assertContains(response, "saved at")
 		self.assertNotContains(response, "other_bus")
 		self.assertNotContains(response, "2222222222")
 
