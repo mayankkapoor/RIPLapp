@@ -1,19 +1,18 @@
 import django_tables2 as tables
 from RIPLapp.models import Volunteer, SOS
 from django.utils.safestring import mark_safe
+from django.utils import timezone
+
 
 class SOSTable(tables.Table):
 	def render_sos_bus(self, value):
-		return mark_safe('<span style="background-color: red">%s</span>' % value);
+		return value.bus_code_num
 
 	def render_sos_volunteer(self, value):
-		return mark_safe('<span style="background-color: red">%s</span>' % value);
+		return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
 	def render_sos_raise_time(self, value):
-		return mark_safe('<span style="background-color: red">%s</span>' % value);
-
-	def render_sos_bus(self, value):
-		return value.bus_code_num
+		return mark_safe('<span style="background-color: yellow">%s</span>' % timezone.localtime(value))
 
 	class Meta:
 		model = SOS
@@ -27,7 +26,7 @@ class OperatorConsoleTable(tables.Table):
 	bus_depot_zone = tables.Column(accessor='volunteer_bus.bus_depot.depot_zone')
 	bus_depot_code = tables.Column(accessor='volunteer_bus.bus_depot.depot_code')
 	bus_depot_name = tables.Column(accessor='volunteer_bus.bus_depot.depot_name')
-	#bus_safe_flag = tables.Column(accessor='volunteer_bus.bus_safe_flag')
+	# bus_safe_flag = tables.Column(accessor='volunteer_bus.bus_safe_flag')
 	bus_safe_time = tables.Column(accessor='volunteer_bus.bus_safe_time')
 	bus_expected_number_of_children = tables.Column(accessor='volunteer_bus.bus_expected_number_of_children')
 	bus_expected_number_of_adults = tables.Column(accessor='volunteer_bus.bus_expected_number_of_adults')
@@ -63,132 +62,132 @@ class OperatorConsoleTable(tables.Table):
 	# Render Bus Code Number
 	def render_volunteer_bus(self, value):
 		return value.bus_code_num
-        
+
 	# Ensure number of children expected == number of children pickedup
 	def render_bus_num_children_male_pickedup(self, value, record):
 		if record.volunteer_bus.bus_num_children_female_pickedup is None or record.volunteer_bus.bus_expected_number_of_children is None:
 			return value
 
 		if value + record.volunteer_bus.bus_num_children_female_pickedup != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: red">%s</span>' % value)
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
 		else:
 			return value
 
-        def render_bus_num_children_female_pickedup(self, value, record):
-                if record.volunteer_bus.bus_num_children_male_pickedup is None or record.volunteer_bus.bus_expected_number_of_children is None:
-                        return value
+	def render_bus_num_children_female_pickedup(self, value, record):
+		if record.volunteer_bus.bus_num_children_male_pickedup is None or record.volunteer_bus.bus_expected_number_of_children is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_children_male_pickedup != record.volunteer_bus.bus_expected_number_of_children:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_children_male_pickedup != record.volunteer_bus.bus_expected_number_of_children:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
 	# Ensure number of adults expected == number of adults picked up
-        def render_bus_num_adults_male_pickedup(self, value, record):
-                if record.volunteer_bus.bus_num_adults_female_pickedup is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-                        return value
+	def render_bus_num_adults_male_pickedup(self, value, record):
+		if record.volunteer_bus.bus_num_adults_female_pickedup is None or record.volunteer_bus.bus_expected_number_of_adults is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_adults_female_pickedup != record.volunteer_bus.bus_expected_number_of_adults:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_adults_female_pickedup != record.volunteer_bus.bus_expected_number_of_adults:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        def render_bus_num_adults_female_pickedup(self, value, record):
-                if record.volunteer_bus.bus_num_adults_male_pickedup is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-                        return value
+	def render_bus_num_adults_female_pickedup(self, value, record):
+		if record.volunteer_bus.bus_num_adults_male_pickedup is None or record.volunteer_bus.bus_expected_number_of_adults is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_adults_male_pickedup != record.volunteer_bus.bus_expected_number_of_adults:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_adults_male_pickedup != record.volunteer_bus.bus_expected_number_of_adults:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
 	# Ensure number of children expected == number of children seated
-        def render_num_children_male_seated(self, value, record):
-                if record.volunteer_bus.num_children_female_seated is None or record.volunteer_bus.bus_expected_number_of_children is None:
-                        return value
+	def render_num_children_male_seated(self, value, record):
+		if record.volunteer_bus.num_children_female_seated is None or record.volunteer_bus.bus_expected_number_of_children is None:
+			return value
 
-                if value + record.volunteer_bus.num_children_female_seated != record.volunteer_bus.bus_expected_number_of_children:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.num_children_female_seated != record.volunteer_bus.bus_expected_number_of_children:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        def render_num_children_female_seated(self, value, record):
-                if record.volunteer_bus.num_children_male_seated is None or record.volunteer_bus.bus_expected_number_of_children is None:
-                        return value
+	def render_num_children_female_seated(self, value, record):
+		if record.volunteer_bus.num_children_male_seated is None or record.volunteer_bus.bus_expected_number_of_children is None:
+			return value
 
-                if value + record.volunteer_bus.num_children_male_seated != record.volunteer_bus.bus_expected_number_of_children:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.num_children_male_seated != record.volunteer_bus.bus_expected_number_of_children:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        # Ensure number of adults expected == number of adults seated
-        def render_num_adults_male_seated(self, value, record):
-                if record.volunteer_bus.num_adults_female_seated is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-                        return value
+	# Ensure number of adults expected == number of adults seated
+	def render_num_adults_male_seated(self, value, record):
+		if record.volunteer_bus.num_adults_female_seated is None or record.volunteer_bus.bus_expected_number_of_adults is None:
+			return value
 
-                if value + record.volunteer_bus.num_adults_female_seated != record.volunteer_bus.bus_expected_number_of_adults:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.num_adults_female_seated != record.volunteer_bus.bus_expected_number_of_adults:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        def render_num_adults_female_seated(self, value, record):
-                if record.volunteer_bus.num_adults_male_seated is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-                        return value
+	def render_num_adults_female_seated(self, value, record):
+		if record.volunteer_bus.num_adults_male_seated is None or record.volunteer_bus.bus_expected_number_of_adults is None:
+			return value
 
-                if value + record.volunteer_bus.num_adults_male_seated != record.volunteer_bus.bus_expected_number_of_adults:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.num_adults_male_seated != record.volunteer_bus.bus_expected_number_of_adults:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        # Ensure number of children expected == number of children on return journey
-        def render_bus_num_children_male_return_journey(self, value, record):
-                if record.volunteer_bus.bus_num_children_female_return_journey is None or record.volunteer_bus.bus_expected_number_of_children is None:
-                        return value
+	# Ensure number of children expected == number of children on return journey
+	def render_bus_num_children_male_return_journey(self, value, record):
+		if record.volunteer_bus.bus_num_children_female_return_journey is None or record.volunteer_bus.bus_expected_number_of_children is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_children_female_return_journey != record.volunteer_bus.bus_expected_number_of_children:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_children_female_return_journey != record.volunteer_bus.bus_expected_number_of_children:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        def render_bus_num_children_female_return_journey(self, value, record):
-                if record.volunteer_bus.bus_num_children_male_return_journey is None or record.volunteer_bus.bus_expected_number_of_children is None:
-                        return value
+	def render_bus_num_children_female_return_journey(self, value, record):
+		if record.volunteer_bus.bus_num_children_male_return_journey is None or record.volunteer_bus.bus_expected_number_of_children is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_children_male_return_journey != record.volunteer_bus.bus_expected_number_of_children:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_children_male_return_journey != record.volunteer_bus.bus_expected_number_of_children:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        # Ensure number of adults expected == number of adults on return journey
-        def render_bus_num_adults_male_return_journey(self, value, record):
-                if record.volunteer_bus.bus_num_adults_female_return_journey is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-                        return value
+	# Ensure number of adults expected == number of adults on return journey
+	def render_bus_num_adults_male_return_journey(self, value, record):
+		if record.volunteer_bus.bus_num_adults_female_return_journey is None or record.volunteer_bus.bus_expected_number_of_adults is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_adults_female_return_journey != record.volunteer_bus.bus_expected_number_of_adults:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_adults_female_return_journey != record.volunteer_bus.bus_expected_number_of_adults:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
-        def render_bus_num_adults_female_return_journey(self, value, record):
-                if record.volunteer_bus.bus_num_adults_male_return_journey is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-                        return value
+	def render_bus_num_adults_female_return_journey(self, value, record):
+		if record.volunteer_bus.bus_num_adults_male_return_journey is None or record.volunteer_bus.bus_expected_number_of_adults is None:
+			return value
 
-                if value + record.volunteer_bus.bus_num_adults_male_return_journey != record.volunteer_bus.bus_expected_number_of_adults:
-                        return mark_safe('<span style="background-color: red">%s</span>' % value)
+		if value + record.volunteer_bus.bus_num_adults_male_return_journey != record.volunteer_bus.bus_expected_number_of_adults:
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-                else:
-                        return value
+		else:
+			return value
 
 	# Ensure number of tickets == number of children + adult expected
 	def render_bus_number_tickets_initial(self, value, record):
@@ -196,7 +195,7 @@ class OperatorConsoleTable(tables.Table):
 			return value
 
 		if record.volunteer_bus.bus_expected_number_of_adults + record.volunteer_bus.bus_expected_number_of_children != value:
-			return mark_safe('<span style="background-color: red">%s</span>' % value)
+			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
 		else:
 			return value
