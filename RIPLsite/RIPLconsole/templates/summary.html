@@ -1,0 +1,62 @@
+{# Summary.html. Summary page for operators  #}
+{% load static %}
+<!doctype html>
+<html>
+    <title>
+	Operator Console
+    </title>
+    <head>
+	<link rel="stylesheet" href="{% static 'paleblue/css/screen.css' %}" type="text/css" />
+    </head>
+    <body>
+	<h2>Summary View</h2>
+<table class="paleblue"> 
+    <thead>
+        <tr>
+            <th>S.No.</th>
+            <th>Summary Reports</th>
+            <th>Expected</th>
+            <th>Current Status</th>
+            <th>Delta</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Number of Buses Started</td>
+            <td>{{expected_num_buses}}</td>
+            <td>{{actual_num_buses_started}}</td>
+            <td>{{delta_buses_started}}</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Number of Buses Debussed at Stadium</td>
+            <td>{{expected_num_buses}}</td>
+            <td>{{actual_num_buses_debussed_at_stadium}}</td>
+            <td>{{delta_buses_debussed_at_stadium}}</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Total Buses reached final drop point</td>
+            <td>{{expected_num_buses}}</td>
+            <td>{{actual_num_buses_reached_drop_point}}</td>
+            <td>{{delta_buses_reached_drop_point}}</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Total Children and Adults Entered Stadium</td>
+            <td>{{expected_num_people}}</td>
+            <td>{{actual_num_people_entered_stadium}}</td>
+            <td>{{delta_people_entered_stadium}}</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Total Children and Adults Dropped at Last Drop Point</td>
+            <td>{{expected_num_people}}</td>
+            <td>{{actual_num_people_dropped}}</td>
+            <td>{{delta_people_dropped}}</td>
+        </tr>
+    </tbody>
+</table>
+    </body>
+</html>
