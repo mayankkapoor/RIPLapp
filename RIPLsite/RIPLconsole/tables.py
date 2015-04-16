@@ -52,7 +52,7 @@ class OperatorConsoleTable(tables.Table):
 	bus_number_tickets_initial = tables.Column(accessor='volunteer_bus.bus_number_tickets_initial')
 	#bus_started_from_depot_flag = tables.Column(accessor='volunteer_bus.bus_started_from_depot_flag')
 	bus_started_from_depot_time = tables.Column(accessor='volunteer_bus.bus_started_from_depot_time')
-	#bus_first_aid_kit_available_flag = tables.Column(accessor='volunteer_bus.bus_first_aid_kit_available_flag')
+	bus_first_aid_kit_available_flag = tables.Column(accessor='volunteer_bus.bus_first_aid_kit_available_flag')
 	bus_num_children_male_pickedup = tables.Column(accessor='volunteer_bus.bus_num_children_male_pickedup')
 	bus_num_children_female_pickedup = tables.Column(accessor='volunteer_bus.bus_num_children_female_pickedup')
 	bus_num_adults_male_pickedup = tables.Column(accessor='volunteer_bus.bus_num_adults_male_pickedup')
