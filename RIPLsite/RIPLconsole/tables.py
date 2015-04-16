@@ -73,8 +73,8 @@ class OperatorConsoleTable(tables.Table):
 	#feedback_form_taken_from_ngo_flag = tables.Column(accessor='volunteer_bus.feedback_form_taken_from_ngo_flag')
 	feedback_form_taken_from_ngo_time = tables.Column(accessor='volunteer_bus.feedback_form_taken_from_ngo_time')
 	bus_furthest_screen = tables.Column(accessor='volunteer_bus.bus_furthest_screen')
-	bus_last_location_latitude = tables.Column(accessor='volunteer_bus.bus_last_location_latitude')
-	bus_last_location_longitude = tables.Column(accessor='volunteer_bus.bus_last_location_longitude')
+	# bus_last_location_latitude = tables.Column(accessor='volunteer_bus.bus_last_location_latitude')
+	# bus_last_location_longitude = tables.Column(accessor='volunteer_bus.bus_last_location_longitude')
 
 	# Render Bus Code Number
 	def render_volunteer_bus(self, value):
