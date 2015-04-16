@@ -16,7 +16,7 @@ def index(request):
 
 def summary(request):
 	expected_num_buses = Bus.objects.count()
-	actual_num_buses_started = Bus.objects.exclude(bus_started_from_depot_time__isnull=True).count()
+	actual_num_buses_started = Bus.objects.exclude(bus_started_from_depot_time__isnull=True)
 	actual_num_buses_debussed_at_stadium = Bus.objects.exclude(all_deboarded_at_stadium_time__isnull=True).count()
 	actual_num_buses_reached_drop_point = Bus.objects.exclude(everyone_dropped_off_time__isnull=True).count()
 	expected_num_people = (Bus.objects.aggregate(child_sum=Sum('bus_expected_number_of_children')).get('child_sum') + 
