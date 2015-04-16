@@ -17,8 +17,7 @@ def index(request):
 
 def summary(request):
 	expected_num_buses = Bus.objects.count()
-	#actual_num_buses_started = Bus.objects.exclude(bus_started_from_depot_time__isnull=True).count()
-	actual_num_buses_started = Bus.objects.filter(bus_started_from_depot_time__gt=datetime.date(2015,1,1)).count()
+	actual_num_buses_started = Bus.objects.exclude(bus_started_from_depot_time__isnull=True)
 	actual_num_buses_debussed_at_stadium = Bus.objects.exclude(all_deboarded_at_stadium_time__isnull=True).count()
 	actual_num_buses_reached_drop_point = Bus.objects.exclude(everyone_dropped_off_time__isnull=True).count()
 	expected_num_people = (Bus.objects.aggregate(child_sum=Sum('bus_expected_number_of_children')).get('child_sum') + 
@@ -32,7 +31,7 @@ def summary(request):
                                         Bus.objects.aggregate(am=Sum('bus_num_adults_male_return_journey')).get('am') +
                                         Bus.objects.aggregate(af=Sum('bus_num_adults_female_return_journey')).get('af'))
 
-	delta_buses_started = getDelta(actual_num_buses_started, expected_num_buses)
+	delta_buses_started = 0 #getDelta(actual_num_buses_started, expected_num_buses)
 	delta_buses_debussed_at_stadium = getDelta(actual_num_buses_debussed_at_stadium, expected_num_buses)
 	delta_buses_reached_drop_point = getDelta(actual_num_buses_reached_drop_point, expected_num_buses)
 	delta_people_entered_stadium = getDelta(actual_num_people_entered_stadium, expected_num_people)
