@@ -16,6 +16,8 @@ def verifySumConstraint(value, addend, expectedSum):
 		return value
 
 class SOSTable(tables.Table):
+	volunteer_full_name = tables.Column(accessor='sos_volunteer.volunteer_full_name')
+
 	def render_sos_bus(self, value):
 		return highlightValue(value.bus_code_num)
 
@@ -25,10 +27,14 @@ class SOSTable(tables.Table):
 	def render_sos_raise_time(self, value):
 		return highlightValue(timezone.localtime(value))
 
+	def render_volunteer_full_name(self, value):
+		return highlightValue(value)
+
 	class Meta:
 		model = SOS
 		# add class="paleblue" to <table> tag
 		attrs = {"class": "paleblue"}
+		sequence = ("...", "sos_bus", "sos_volunteer", "volunteer_full_name", "sos_raise_time")
 
 
 # Fundamentally the root of all ForeignKeys comes from Volunteers, so using that as the base model

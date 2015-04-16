@@ -2,17 +2,23 @@ from django.shortcuts import render
 from django_tables2 import RequestConfig
 from RIPLapp.models import Bus, SOS, Volunteer
 from RIPLconsole.tables import OperatorConsoleTable, SOSTable
-from RIPLconsole.filters import VolunteerFilter
+from RIPLconsole.filters import SOSFilter, VolunteerFilter
 from django.db.models import Count, Sum
 from django.utils.safestring import mark_safe
 
 def index(request):
 	vol_queryset = Volunteer.objects.select_related().all()
 	vol_filter = VolunteerFilter(request.GET, queryset=vol_queryset)
-	sos = SOSTable(SOS.objects.all())
 	tracking = OperatorConsoleTable(vol_filter.qs)
 	RequestConfig(request).configure(tracking)
-	return render(request, 'console.html', {'tracking': tracking, 'sos': sos, 'vol_filter': vol_filter})
+	return render(request, 'console.html', {'tracking': tracking, 'vol_filter': vol_filter})
+
+def sos(request):
+        sos_queryset = SOS.objects.select_related().all()
+        sos_filter = SOSFilter(request.GET, queryset=sos_queryset)
+	sos = SOSTable(sos_filter.qs)
+	RequestConfig(request).configure(sos)
+	return render(request, 'sos.html', {'sos': sos, 'sos_filter': sos_filter})
 
 def summary(request):
 	expected_num_buses = Bus.objects.count()
