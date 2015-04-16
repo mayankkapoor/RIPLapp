@@ -12,9 +12,8 @@ def index(request):
 	vol_queryset = Volunteer.objects.select_related().all()
 	vol_filter = VolunteerFilter(request.GET, queryset=vol_queryset)
 	tracking = OperatorConsoleTable(vol_filter.qs)
-	tracking.paginate(per_page=100)
 	tracking.order_by = "volunteer_bus"
-	RequestConfig(request).configure(tracking)
+	RequestConfig(request, paginate={"per_page": 100}).configure(tracking)
 	return render(request, 'console.html', {'tracking': tracking, 'vol_filter': vol_filter})
 
 
