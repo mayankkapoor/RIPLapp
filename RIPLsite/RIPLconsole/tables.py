@@ -3,21 +3,38 @@ from RIPLapp.models import Volunteer, SOS
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 
+def highlightValue(value):
+	return mark_safe('<span style="background-color: yellow">%s</span>' % value)
+
+def verifySumConstraint(value, addend, expectedSum):
+	if value is None or addend is None or expectedSum is None:
+		return value
+
+	if value + addend != expectedSum:
+		return highlightValue(value)
+	else:
+		return value
 
 class SOSTable(tables.Table):
+	volunteer_full_name = tables.Column(accessor='sos_volunteer.volunteer_full_name')
+
 	def render_sos_bus(self, value):
-		return value.bus_code_num
+		return highlightValue(value.bus_code_num)
 
 	def render_sos_volunteer(self, value):
-		return mark_safe('<span style="background-color: yellow">%s</span>' % value)
+		return highlightValue(value)
 
 	def render_sos_raise_time(self, value):
-		return mark_safe('<span style="background-color: yellow">%s</span>' % timezone.localtime(value))
+		return highlightValue(timezone.localtime(value))
+
+	def render_volunteer_full_name(self, value):
+		return highlightValue(value)
 
 	class Meta:
 		model = SOS
 		# add class="paleblue" to <table> tag
 		attrs = {"class": "paleblue"}
+		sequence = ("...", "sos_bus", "sos_volunteer", "volunteer_full_name", "sos_raise_time")
 
 
 # Fundamentally the root of all ForeignKeys comes from Volunteers, so using that as the base model
@@ -62,143 +79,78 @@ class OperatorConsoleTable(tables.Table):
 	# Render Bus Code Number
 	def render_volunteer_bus(self, value):
 		return value.bus_code_num
-
-	# Ensure number of children expected == number of children pickedup
+	
+	# Ensure number of children expected == number of children picked up
 	def render_bus_num_children_male_pickedup(self, value, record):
-		if record.volunteer_bus.bus_num_children_female_pickedup is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_children_female_pickedup != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value, 
+					record.volunteer_bus.bus_num_children_female_pickedup, 
+					record.volunteer_bus.bus_expected_number_of_children)
 
 	def render_bus_num_children_female_pickedup(self, value, record):
-		if record.volunteer_bus.bus_num_children_male_pickedup is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_children_male_pickedup != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+                return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_children_male_pickedup, 
+                                        record.volunteer_bus.bus_expected_number_of_children)
 
 	# Ensure number of adults expected == number of adults picked up
 	def render_bus_num_adults_male_pickedup(self, value, record):
-		if record.volunteer_bus.bus_num_adults_female_pickedup is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_adults_female_pickedup != record.volunteer_bus.bus_expected_number_of_adults:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
-
+                return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_adults_female_pickedup, 
+                                        record.volunteer_bus.bus_expected_number_of_adults)
+		
 	def render_bus_num_adults_female_pickedup(self, value, record):
-		if record.volunteer_bus.bus_num_adults_male_pickedup is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_adults_male_pickedup != record.volunteer_bus.bus_expected_number_of_adults:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_adults_male_pickedup,  
+                                        record.volunteer_bus.bus_expected_number_of_adults)
 
 	# Ensure number of children expected == number of children seated
 	def render_num_children_male_seated(self, value, record):
-		if record.volunteer_bus.num_children_female_seated is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if value + record.volunteer_bus.num_children_female_seated != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.num_children_female_seated,  
+                                        record.volunteer_bus.bus_expected_number_of_children)
 
 	def render_num_children_female_seated(self, value, record):
-		if record.volunteer_bus.num_children_male_seated is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if value + record.volunteer_bus.num_children_male_seated != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.num_children_male_seated,  
+                                        record.volunteer_bus.bus_expected_number_of_children)	
 
 	# Ensure number of adults expected == number of adults seated
 	def render_num_adults_male_seated(self, value, record):
-		if record.volunteer_bus.num_adults_female_seated is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-			return value
-
-		if value + record.volunteer_bus.num_adults_female_seated != record.volunteer_bus.bus_expected_number_of_adults:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.num_adults_female_seated,  
+                                        record.volunteer_bus.bus_expected_number_of_adults)
 
 	def render_num_adults_female_seated(self, value, record):
-		if record.volunteer_bus.num_adults_male_seated is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-			return value
-
-		if value + record.volunteer_bus.num_adults_male_seated != record.volunteer_bus.bus_expected_number_of_adults:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.num_adults_male_seated,  
+                                        record.volunteer_bus.bus_expected_number_of_adults)
 
 	# Ensure number of children expected == number of children on return journey
 	def render_bus_num_children_male_return_journey(self, value, record):
-		if record.volunteer_bus.bus_num_children_female_return_journey is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_children_female_return_journey != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_children_female_return_journey,  
+                                        record.volunteer_bus.bus_expected_number_of_children)
 
 	def render_bus_num_children_female_return_journey(self, value, record):
-		if record.volunteer_bus.bus_num_children_male_return_journey is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_children_male_return_journey != record.volunteer_bus.bus_expected_number_of_children:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_children_male_return_journey,
+                                        record.volunteer_bus.bus_expected_number_of_children)
 
 	# Ensure number of adults expected == number of adults on return journey
 	def render_bus_num_adults_male_return_journey(self, value, record):
-		if record.volunteer_bus.bus_num_adults_female_return_journey is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_adults_female_return_journey != record.volunteer_bus.bus_expected_number_of_adults:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+		return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_adults_female_return_journey,
+                                        record.volunteer_bus.bus_expected_number_of_adults)
 
 	def render_bus_num_adults_female_return_journey(self, value, record):
-		if record.volunteer_bus.bus_num_adults_male_return_journey is None or record.volunteer_bus.bus_expected_number_of_adults is None:
-			return value
-
-		if value + record.volunteer_bus.bus_num_adults_male_return_journey != record.volunteer_bus.bus_expected_number_of_adults:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+                return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_num_adults_male_return_journey,
+                                        record.volunteer_bus.bus_expected_number_of_adults)
 
 	# Ensure number of tickets == number of children + adult expected
 	def render_bus_number_tickets_initial(self, value, record):
-		if record.volunteer_bus.bus_expected_number_of_adults is None or record.volunteer_bus.bus_expected_number_of_children is None:
-			return value
-
-		if record.volunteer_bus.bus_expected_number_of_adults + record.volunteer_bus.bus_expected_number_of_children != value:
-			return mark_safe('<span style="background-color: yellow">%s</span>' % value)
-
-		else:
-			return value
+                return verifySumConstraint(value,
+                                        record.volunteer_bus.bus_expected_number_of_adults,
+                                        record.volunteer_bus.bus_expected_number_of_children)
 
 	class Meta:
 		model = Volunteer

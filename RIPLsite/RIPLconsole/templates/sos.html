@@ -1,22 +1,23 @@
-{# Console.html. Central page for operators  #}
+{# Sos.html. Sos page for operators  #}
 {% load render_table from django_tables2 %}
 {% load static %}
 <!doctype html>
 <html>
     <title>
-	Operator Console
+	SOS Console
     </title>
     <head>
 	<link rel="stylesheet" href="{% static 'paleblue/css/screen.css' %}" type="text/css" />
     </head>
     <body>
-	<h2>Tracking</h2>
-	{% block volunteercontent %}
+	<h2>SOS</h2>
+	{% block soscontent %}
                 <form action="" method="get">
-                        {{ vol_filter.form.as_p }} <input type="Submit" />
+                        {{ sos_filter.form.as_p }} <input type="Submit" />
                 </form>
         {% endblock %}
 	<br/>
-        {% render_table tracking %}
+	<br/>
+	{% render_table sos %}
     </body>
 </html>
