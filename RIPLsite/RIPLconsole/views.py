@@ -35,12 +35,14 @@ def summary(request):
 		                        Bus.objects.aggregate(cf=Sum('bus_num_children_female_return_journey')).get('cf') +
                                         Bus.objects.aggregate(am=Sum('bus_num_adults_male_return_journey')).get('am') +
                                         Bus.objects.aggregate(af=Sum('bus_num_adults_female_return_journey')).get('af'))
+	num_buses_with_volunteers = Volunteer.objects.exclude(volunteer_bus__isnull=True).distinct('volunteer_bus').count()
 
 	delta_buses_started = getDelta(actual_num_buses_started, expected_num_buses)
 	delta_buses_debussed_at_stadium = getDelta(actual_num_buses_debussed_at_stadium, expected_num_buses)
 	delta_buses_reached_drop_point = getDelta(actual_num_buses_reached_drop_point, expected_num_buses)
 	delta_people_entered_stadium = getDelta(actual_num_people_entered_stadium, expected_num_people)
 	delta_people_dropped = getDelta(actual_num_people_dropped, expected_num_people)
+	delta_num_buses_with_volunteers = getDelta(num_buses_with_volunteers, expected_num_buses)
 
 	return render(request, 
 			'summary.html', 
@@ -51,11 +53,13 @@ def summary(request):
 			'expected_num_people': expected_num_people,
 			'actual_num_people_entered_stadium': actual_num_people_entered_stadium,
 			'actual_num_people_dropped': actual_num_people_dropped,
+			'num_buses_with_volunteers': num_buses_with_volunteers,
 			'delta_buses_started': delta_buses_started,
                         'delta_buses_debussed_at_stadium': delta_buses_debussed_at_stadium,
                         'delta_buses_reached_drop_point': delta_buses_reached_drop_point,
                         'delta_people_entered_stadium': delta_people_entered_stadium,
-                        'delta_people_dropped': delta_people_dropped,})
+                        'delta_people_dropped': delta_people_dropped,
+			'delta_num_buses_with_volunteers': delta_num_buses_with_volunteers,})
 
 def getDelta(actual, expected):
 	delta = actual - expected
