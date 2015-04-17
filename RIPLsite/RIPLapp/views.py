@@ -49,10 +49,19 @@ def screen1login_response(request):
 	bus_code_num, volunteer_phone_num = get_bus_phone(request)
 	# With the above function, the below if check is redundant, still keeping it as it is
 	# TODO clean up the if check after verifying it's not required
+
+	time_now = timezone.now()
+
+	screen1_vars = {'bus_volunteer_depot_login_time': time_now,
+                'bus_furthest_screen': 1,
+                }
+	auto_vars = ['bus_volunteer_depot_login_time']
+
 	if bus_code_num and volunteer_phone_num:
 		# TODO: This allows association of a single phone w/ multiple buses, is it correct?
 		# MK: No. multiple phones for 1 bus is possible. Multiple buses per phone should not be possible.
 		response_data = response_data_dict(bus_code_num, volunteer_phone_num)
+		screen_data_processing(request, screen1_vars, auto_vars)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
 		response = HttpResponse()
