@@ -53,7 +53,6 @@ def screen1login_response(request):
 	time_now = timezone.now()
 
 	screen1_vars = {'bus_volunteer_depot_login_time': time_now,
-                'bus_furthest_screen': 1,
                 }
 	auto_vars = ['bus_volunteer_depot_login_time']
 
