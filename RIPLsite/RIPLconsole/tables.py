@@ -47,7 +47,7 @@ class OperatorConsoleTable(tables.Table):
 	bus_depot_zone = tables.Column(accessor='volunteer_bus.bus_depot.depot_zone')
 	bus_depot_code = tables.Column(accessor='volunteer_bus.bus_depot.depot_code')
 	bus_depot_name = tables.Column(accessor='volunteer_bus.bus_depot.depot_name')
-	# bus_safe_flag = tables.Column(accessor='volunteer_bus.bus_safe_flag')
+	bus_volunteer_depot_login_time = tables.Column(accessor='volunteer_bus.bus_volunteer_depot_login_time')
 	bus_safe_time = tables.Column(accessor='volunteer_bus.bus_safe_time')
 	bus_expected_number_of_children = tables.Column(accessor='volunteer_bus.bus_expected_number_of_children')
 	bus_expected_number_of_adults = tables.Column(accessor='volunteer_bus.bus_expected_number_of_adults')
