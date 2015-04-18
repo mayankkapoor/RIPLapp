@@ -279,7 +279,10 @@ class Screen6EveryoneDeboardedTest(TestCase):
 			if 'location' in key:
 				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
 		response = self.client.post(settings.APP_URL + '/screen6/', correct_bus_dict)
-		self.assertContains(response, 'OK')
+		self.assertContains(response, 'bus_num_children_male_pickedup')
+		self.assertContains(response, 'bus_num_children_female_pickedup')
+		self.assertContains(response, 'bus_num_adults_male_pickedup')
+		self.assertContains(response, 'bus_num_adults_female_pickedup')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)
@@ -354,7 +357,10 @@ class Screen7SeatedAtStadiumTest(TestCase):
 				correct_bus_dict.update({key: decimal.Decimal(random.randrange(-900000, 900000, 1)) / 10000})
 
 		response = self.client.post(settings.APP_URL + '/screen7/', correct_bus_dict)
-		self.assertContains(response, 'OK')
+		self.assertContains(response, 'bus_num_children_male_pickedup')
+		self.assertContains(response, 'bus_num_children_female_pickedup')
+		self.assertContains(response, 'bus_num_adults_male_pickedup')
+		self.assertContains(response, 'bus_num_adults_female_pickedup')
 		response = self.client.post(settings.APP_URL + '/screentest/',
 		                            {'bus_code_num': 'correct_bus', 'volunteer_phone_num': 1111111111})
 		response_yaml = yaml.load(response.content)

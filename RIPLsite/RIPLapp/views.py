@@ -52,8 +52,7 @@ def screen1login_response(request):
 
 	time_now = timezone.now()
 
-	screen1_vars = {'bus_volunteer_depot_login_time': time_now,
-                }
+	screen1_vars = {'bus_volunteer_depot_login_time': time_now}
 	auto_vars = ['bus_volunteer_depot_login_time']
 
 	if bus_code_num and volunteer_phone_num:
@@ -218,7 +217,10 @@ def screen6_everyone_deboarded(request):
 	                'bus_last_location_longitude': 0.0
 	                }
 	auto_vars = ['all_deboarded_at_stadium_time']
-	return screen_data_processing(request, screen6_vars, auto_vars)
+	screen_data_processing(request, screen6_vars, auto_vars)
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
+	return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
 @csrf_exempt
@@ -231,7 +233,10 @@ def screen7_seated_at_stadium_count(request):
 	                'bus_last_location_latitude': 0.0,
 	                'bus_last_location_longitude': 0.0
 	                }
-	return screen_data_processing(request, screen7_vars)
+	screen_data_processing(request, screen7_vars)
+	bus_code_num, volunteer_phone_num = get_bus_phone(request)
+	response_data = response_data_dict(bus_code_num, volunteer_phone_num)
+	return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
 @csrf_exempt
@@ -283,10 +288,11 @@ def sos_report(request):
 		new_sos = SOS.objects.create(sos_bus=query_buses[0], sos_volunteer=sos_volunteer, sos_raise_time=time_now)
 	else:
 		raise Exception("Error: Sos query_buses did not return a unique bus. Somethings off.")
-	return HttpResponse("SOS with bus code {0:s} & volunteer phone number {1:s} saved at {2:s}.".format(new_sos.sos_bus.bus_code_num,
-	                                                                                                    new_sos.sos_volunteer,
-	                                                                                                    str(
-		                                                                                                    new_sos.sos_raise_time)))
+	return HttpResponse(
+		"SOS with bus code {0:s} & volunteer phone number {1:s} saved at {2:s}.".format(new_sos.sos_bus.bus_code_num,
+		                                                                                new_sos.sos_volunteer,
+		                                                                                str(
+			                                                                                new_sos.sos_raise_time)))
 
 
 @csrf_exempt
