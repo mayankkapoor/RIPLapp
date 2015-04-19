@@ -15,53 +15,88 @@
         <tr>
             <th>S.No.</th>
             <th>Summary Reports</th>
-            <th>Expected</th>
+            <th>Scope</th>
             <th>Current Status</th>
             <th>Delta</th>
         </tr>
     </thead>
     <tbody>
         <tr>
+            <td>0</td>
+            <td>Number of buses assigned volunteers</td>
+            <td>{{expected_num_buses}}</td>
+            <td>{{num_buses_with_volunteers}}</td>
+            <td>{{delta_num_buses_with_volunteers}}</td>
+        </tr>
+        <tr>
             <td>1</td>
-            <td>Number of Buses Started</td>
+            <td>Total number of volunteers reported at depot</td>
+            <td>{{expected_num_volunteers}}</td>
+            <td>{{actual_num_volunteers_reported_at_depot}}</td>
+            <td>{{delta_volunteers_reported_at_depot}}</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Total number of buses left depot to pickup point</td>
             <td>{{expected_num_buses}}</td>
             <td>{{actual_num_buses_started}}</td>
             <td>{{delta_buses_started}}</td>
         </tr>
         <tr>
-            <td>2</td>
-            <td>Number of Buses Debussed at Stadium</td>
+            <td>3</td>
+            <td>Total number of children picked up</td>
+            <td>{{expected_num_children}}</td>
+            <td>{{actual_num_children_pickedup}}</td>
+            <td>{{delta_children_pickedup}}</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Total number of adults picked up</td>
+            <td>{{expected_num_adults}}</td>
+            <td>{{actual_num_adults_pickedup}}</td>
+            <td>{{delta_adults_pickedup}}</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Total number of buses that have reached stadium</td>
             <td>{{expected_num_buses}}</td>
             <td>{{actual_num_buses_debussed_at_stadium}}</td>
             <td>{{delta_buses_debussed_at_stadium}}</td>
         </tr>
         <tr>
-            <td>3</td>
-            <td>Total Buses reached final drop point</td>
+            <td>6</td>
+            <td>Total number of children inside stadium</td>
+            <td>{{expected_num_children}}</td>
+            <td>{{actual_num_children_entered_stadium}}</td>
+            <td>{{delta_children_entered_stadium}}</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Total number of adults inside stadium</td>
+            <td>{{expected_num_adults}}</td>
+            <td>{{actual_num_adults_entered_stadium}}</td>
+            <td>{{delta_adults_entered_stadium}}</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>Total number of buses reached final drop point</td>
             <td>{{expected_num_buses}}</td>
             <td>{{actual_num_buses_reached_drop_point}}</td>
             <td>{{delta_buses_reached_drop_point}}</td>
         </tr>
         <tr>
-            <td>4</td>
-            <td>Total Children and Adults Entered Stadium</td>
-            <td>{{expected_num_people}}</td>
-            <td>{{actual_num_people_entered_stadium}}</td>
-            <td>{{delta_people_entered_stadium}}</td>
+            <td>9</td>
+            <td>Total number of children dropped off</td>
+            <td>{{expected_num_children}}</td>
+            <td>{{actual_num_children_dropped}}</td>
+            <td>{{delta_children_dropped}}</td>
         </tr>
         <tr>
-            <td>5</td>
-            <td>Total Children and Adults Dropped at Last Drop Point</td>
-            <td>{{expected_num_people}}</td>
-            <td>{{actual_num_people_dropped}}</td>
-            <td>{{delta_people_dropped}}</td>
-        </tr>
-        <tr>
-            <td>6</td>
-            <td>Number of buses with volunteers</td>
-            <td>{{expected_num_buses}}</td>
-            <td>{{num_buses_with_volunteers}}</td>
-            <td>{{delta_num_buses_with_volunteers}}</td>
+            <td>10</td>
+            <td>Total number of adults dropped off</td>
+            <td>{{expected_num_adults}}</td>
+            <td>{{actual_num_adults_dropped}}</td>
+            <td>{{delta_adults_dropped}}</td>
         </tr>
     </tbody>
 </table>
