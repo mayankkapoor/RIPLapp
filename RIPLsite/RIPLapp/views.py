@@ -164,7 +164,12 @@ def response_data_dict(bus_code_num, volunteer_phone_num):
 		if query_buses.count() == 0:
 			new_volunteer = Volunteer(volunteer_phone_num=volunteer_phone_num)
 			new_bus = Bus(bus_code_num=bus_code_num)
-			new_bus.save()
+			#Saving a new bus while login will cause problems when
+			# 1) There is a change of volunteer for a bus
+			# 2) If there is a new volunteer
+			# 3) If master update does not have volunteer-bus mapping, it will result in (2) above.
+			# Anyways, for all practical purposes, a bus should be pre-existing and not created during login
+			#new_bus.save()
 			new_volunteer.volunteer_bus = new_bus
 			new_volunteer.save()
 		elif query_buses.count() == 1:
