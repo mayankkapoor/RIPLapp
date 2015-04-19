@@ -6,14 +6,14 @@ from django.utils import timezone
 def highlightValue(value):
 	return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-def verifySumConstraint(expectedSum, value, addend):
+def verifySumConstraint(value, addend, expectedSum):
 	if value is None or addend is None or expectedSum is None:
-		return expectedSum
+		return value
 
 	if value + addend != expectedSum:
-		return highlightValue(expectedSum)
+		return highlightValue(value)
 	else:
-		return expectedSum
+		return value
 
 class SOSTable(tables.Table):
 	volunteer_full_name = tables.Column(accessor='sos_volunteer.volunteer_full_name')
@@ -91,13 +91,13 @@ class OperatorConsoleTable(tables.Table):
 					record.volunteer_bus.bus_expected_number_of_children)
 
 	def render_bus_num_children_female_pickedup(self, value, record):
-		return verifySumConstraint(value,
+                return verifySumConstraint(value,
                                         record.volunteer_bus.bus_num_children_male_pickedup, 
                                         record.volunteer_bus.bus_expected_number_of_children)
 
 	# Ensure number of adults expected == number of adults picked up
 	def render_bus_num_adults_male_pickedup(self, value, record):
-		return verifySumConstraint(value,
+                return verifySumConstraint(value,
                                         record.volunteer_bus.bus_num_adults_female_pickedup, 
                                         record.volunteer_bus.bus_expected_number_of_adults)
 		
@@ -146,13 +146,13 @@ class OperatorConsoleTable(tables.Table):
                                         record.volunteer_bus.bus_expected_number_of_adults)
 
 	def render_bus_num_adults_female_return_journey(self, value, record):
-		return verifySumConstraint(value,
+                return verifySumConstraint(value,
                                         record.volunteer_bus.bus_num_adults_male_return_journey,
                                         record.volunteer_bus.bus_expected_number_of_adults)
 
 	# Ensure number of tickets == number of children + adult expected
 	def render_bus_number_tickets_initial(self, value, record):
-		return verifySumConstraint(value,
+                return verifySumConstraint(value,
                                         record.volunteer_bus.bus_expected_number_of_adults,
                                         record.volunteer_bus.bus_expected_number_of_children)
 
