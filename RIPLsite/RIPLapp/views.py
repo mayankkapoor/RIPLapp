@@ -26,6 +26,7 @@ def request_obtain(request, param):
 
 def get_bus_phone(request):
 	bus_code_num = request_obtain(request, 'bus_code_num')
+	bus_code_num = bus_code_num.upper()
 	volunteer_phone_num = request_obtain(request, 'volunteer_phone_num')
 	if bus_code_num and volunteer_phone_num:
 		# The success will be handled by respective API handlers
