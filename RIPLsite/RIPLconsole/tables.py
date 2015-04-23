@@ -115,7 +115,7 @@ class OperatorConsoleTable(tables.Table):
                                         record.volunteer_bus.bus_num_adults_male_pickedup,  
                                         record.volunteer_bus.bus_expected_number_of_adults)
 
-	# Ensure number of children expected == number of children seated
+	# Ensure number of children seated == number of children picked up
 	def render_num_children_male_seated(self, value, record):
 		return verifyEqualityConstraint(value,
                                         0,  
@@ -126,7 +126,7 @@ class OperatorConsoleTable(tables.Table):
                                         0,  
                                         record.volunteer_bus.bus_num_children_female_pickedup)	
 
-	# Ensure number of adults expected == number of adults seated
+	# Ensure number of adults seated == number of adults picked up
 	def render_num_adults_male_seated(self, value, record):
 		return verifyEqualityConstraint(value,
                                         0,  
@@ -137,7 +137,7 @@ class OperatorConsoleTable(tables.Table):
                                         0,  
                                         record.volunteer_bus.bus_num_adults_female_pickedup)
 
-	# Ensure number of children expected == number of children on return journey
+	# Ensure number of children on return journey == number of children seated
 	def render_bus_num_children_male_return_journey(self, value, record):
 		return verifyEqualityConstraint(value,
                                         0,  
@@ -148,7 +148,7 @@ class OperatorConsoleTable(tables.Table):
                                         0,
                                         record.volunteer_bus.num_children_female_seated)
 
-	# Ensure number of adults expected == number of adults on return journey
+	# Ensure number of adults on return journey == number of adults seated
 	def render_bus_num_adults_male_return_journey(self, value, record):
 		return verifyEqualityConstraint(value,
                                         0,
@@ -159,17 +159,19 @@ class OperatorConsoleTable(tables.Table):
                                         0,
                                         record.volunteer_bus.num_adults_female_seated)
 
-	# Ensure number of tickets == number of children + adult expected
+	# Ensure number of tickets >= number of children + adult expected
 	def render_bus_number_tickets_initial(self, value, record):
 		return verifyLessThanConstraint(record.volunteer_bus.bus_expected_number_of_adults,
 					record.volunteer_bus.bus_expected_number_of_children, 
 					value)
 
+	# Ensure number of water bottles >= number of children + adult expected
 	def render_bus_number_water_bottles_initial(self, value, record):
 		return verifyLessThanConstraint(record.volunteer_bus.bus_expected_number_of_adults,
                                         record.volunteer_bus.bus_expected_number_of_children, 
                                         value)
 
+	# Ensure number of food packets >= number of children + adult expected
 	def render_bus_number_food_packets_initial(self, value, record):
                 return verifyLessThanConstraint(record.volunteer_bus.bus_expected_number_of_adults,
                                         record.volunteer_bus.bus_expected_number_of_children,
