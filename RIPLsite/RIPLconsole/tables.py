@@ -6,7 +6,7 @@ from django.utils import timezone
 def highlightValue(value):
 	return mark_safe('<span style="background-color: yellow">%s</span>' % value)
 
-def verifySumConstraint(value, addend, expectedSum):
+def verifyEqualityConstraint(value, addend, expectedSum):
 	if value is None or addend is None or expectedSum is None:
 		return value
 
@@ -14,6 +14,15 @@ def verifySumConstraint(value, addend, expectedSum):
 		return highlightValue(value)
 	else:
 		return value
+
+def verifyLessThanConstraint(addend1, addend2, value):
+        if value is None or addend1 is None or addend2 is None:
+                return value
+
+        if addend1 + addend2 > value:
+                return highlightValue(value)
+        else:
+                return value
 
 class SOSTable(tables.Table):
 	volunteer_full_name = tables.Column(accessor='sos_volunteer.volunteer_full_name')
@@ -86,79 +95,87 @@ class OperatorConsoleTable(tables.Table):
 	
 	# Ensure number of children expected == number of children picked up
 	def render_bus_num_children_male_pickedup(self, value, record):
-		return verifySumConstraint(value, 
+		return verifyEqualityConstraint(value, 
 					record.volunteer_bus.bus_num_children_female_pickedup, 
 					record.volunteer_bus.bus_expected_number_of_children)
 
 	def render_bus_num_children_female_pickedup(self, value, record):
-		return verifySumConstraint(value,
+		return verifyEqualityConstraint(value,
                                         record.volunteer_bus.bus_num_children_male_pickedup, 
                                         record.volunteer_bus.bus_expected_number_of_children)
 
 	# Ensure number of adults expected == number of adults picked up
 	def render_bus_num_adults_male_pickedup(self, value, record):
-		return verifySumConstraint(value,
+		return verifyEqualityConstraint(value,
                                         record.volunteer_bus.bus_num_adults_female_pickedup, 
                                         record.volunteer_bus.bus_expected_number_of_adults)
 		
 	def render_bus_num_adults_female_pickedup(self, value, record):
-		return verifySumConstraint(value,
+		return verifyEqualityConstraint(value,
                                         record.volunteer_bus.bus_num_adults_male_pickedup,  
                                         record.volunteer_bus.bus_expected_number_of_adults)
 
-	# Ensure number of children expected == number of children seated
+	# Ensure number of children seated == number of children picked up
 	def render_num_children_male_seated(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.num_children_female_seated,  
-                                        record.volunteer_bus.bus_expected_number_of_children)
+		return verifyEqualityConstraint(value,
+                                        0,  
+                                        record.volunteer_bus.bus_num_children_male_pickedup)
 
 	def render_num_children_female_seated(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.num_children_male_seated,  
-                                        record.volunteer_bus.bus_expected_number_of_children)	
+		return verifyEqualityConstraint(value,
+                                        0,  
+                                        record.volunteer_bus.bus_num_children_female_pickedup)	
 
-	# Ensure number of adults expected == number of adults seated
+	# Ensure number of adults seated == number of adults picked up
 	def render_num_adults_male_seated(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.num_adults_female_seated,  
-                                        record.volunteer_bus.bus_expected_number_of_adults)
+		return verifyEqualityConstraint(value,
+                                        0,  
+                                        record.volunteer_bus.bus_num_adults_male_pickedup)
 
 	def render_num_adults_female_seated(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.num_adults_male_seated,  
-                                        record.volunteer_bus.bus_expected_number_of_adults)
+		return verifyEqualityConstraint(value,
+                                        0,  
+                                        record.volunteer_bus.bus_num_adults_female_pickedup)
 
-	# Ensure number of children expected == number of children on return journey
+	# Ensure number of children on return journey == number of children seated
 	def render_bus_num_children_male_return_journey(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.bus_num_children_female_return_journey,  
-                                        record.volunteer_bus.bus_expected_number_of_children)
+		return verifyEqualityConstraint(value,
+                                        0,  
+                                        record.volunteer_bus.num_children_male_seated)
 
 	def render_bus_num_children_female_return_journey(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.bus_num_children_male_return_journey,
-                                        record.volunteer_bus.bus_expected_number_of_children)
+		return verifyEqualityConstraint(value,
+                                        0,
+                                        record.volunteer_bus.num_children_female_seated)
 
-	# Ensure number of adults expected == number of adults on return journey
+	# Ensure number of adults on return journey == number of adults seated
 	def render_bus_num_adults_male_return_journey(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.bus_num_adults_female_return_journey,
-                                        record.volunteer_bus.bus_expected_number_of_adults)
+		return verifyEqualityConstraint(value,
+                                        0,
+                                        record.volunteer_bus.num_adults_male_seated)
 
 	def render_bus_num_adults_female_return_journey(self, value, record):
-		return verifySumConstraint(value,
-                                        record.volunteer_bus.bus_num_adults_male_return_journey,
-                                        record.volunteer_bus.bus_expected_number_of_adults)
+		return verifyEqualityConstraint(value,
+                                        0,
+                                        record.volunteer_bus.num_adults_female_seated)
 
-	# Ensure number of tickets == number of children + adult expected
+	# Ensure number of tickets >= number of children + adult expected
 	def render_bus_number_tickets_initial(self, value, record):
-		if value is None or record.volunteer_bus.bus_expected_number_of_adults is None or record.volunteer_bus.bus_expected_number_of_children is None:
-                	return value
+		return verifyLessThanConstraint(record.volunteer_bus.bus_expected_number_of_adults,
+					record.volunteer_bus.bus_expected_number_of_children, 
+					value)
 
-	        if record.volunteer_bus.bus_expected_number_of_adults + record.volunteer_bus.bus_expected_number_of_children != value:
-        	        return highlightValue(value)
-	        else:
-        	        return value
+	# Ensure number of water bottles >= number of children + adult expected
+	def render_bus_number_water_bottles_initial(self, value, record):
+		return verifyLessThanConstraint(record.volunteer_bus.bus_expected_number_of_adults,
+                                        record.volunteer_bus.bus_expected_number_of_children, 
+                                        value)
+
+	# Ensure number of food packets >= number of children + adult expected
+	def render_bus_number_food_packets_initial(self, value, record):
+                return verifyLessThanConstraint(record.volunteer_bus.bus_expected_number_of_adults,
+                                        record.volunteer_bus.bus_expected_number_of_children,
+                                        value)
 
 	class Meta:
 		model = Volunteer
