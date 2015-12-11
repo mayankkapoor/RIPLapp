@@ -1,0 +1,12 @@
+{
+  "name": "RIPLapp",
+  "description": "",
+  "scripts": {
+  },
+  "env": {
+  },
+  "addons": [
+    "heroku-postgresql",
+    "autobus"
+  ]
+}
